@@ -1,0 +1,279 @@
+import { useCallback, useEffect, useState } from "react"
+import Container from "../layouts/Container"
+import Select from 'react-select'
+import moment from "moment/moment"
+import { FiMapPin } from "react-icons/fi";
+import { useAtom, atom, useSetAtom } from "jotai";
+import { searchFilterAtom } from "./HomeBanner";
+import { IoIosClose } from "react-icons/io";
+import { motion } from "framer-motion"
+
+export const jobsListingAtom = atom([])
+
+const JobCatergoryList = ({data, onCategoryClick, activeCategories})=> {
+
+    const onCategory = useCallback((value)=> {
+        let list
+        if(activeCategories.includes(value)){
+            list = activeCategories.filter(item=> item !== value)
+        }else{
+            list = [...activeCategories, value]
+        }
+        onCategoryClick({
+            predicted_de_job_category: [...new Set(list)]
+        })
+    }, [activeCategories])
+
+
+    return (
+        <ul className="flex w-full items-center gap-3 overflow-x-scroll no-scrollba lg:justify-start 2xl:justify-center">
+            {
+                data?.categories?.map((item, index)=> (
+                    <li className="relative inline-block" key={'category-' + index}>
+                        <button className={`tag ${activeCategories?.includes(item) ? 'active' : ''}`} onClick={()=> onCategory(item)}>{item}</button>
+                    </li>
+                ))
+            }
+        </ul>
+    )
+}
+
+const JobFilter = ({data, totalJobs, onCompaniesChanged, onCategoriesChanged, filterValues})=> {
+
+    const [filters, setFilters] = useState({})
+
+    useEffect(()=> {
+        setFilters(()=> {
+            return {
+                companies: data.companies.map((item)=> {return {value: item, label: item}}),
+                categories: data.categories.map((item)=> {return {value: item, label: item}}),
+            }
+        })
+    }, [])
+
+    return (
+        <div className="relative flex items-center justify-between gap-5 mt-12 mb-6">
+            <div className="inline-flex items-center gap-3">
+                {
+                    filters.companies &&
+                    <Select 
+                        options={[{value: '', label: 'All Companies'}, ...filters.companies]} 
+                        placeholder={<span>Filter by Company <strong>{filters.companies.length}</strong></span>}
+                        classNamePrefix={'dej-select'}
+                        className="custom-select"
+                        onChange={(e)=> onCompaniesChanged({company: e.value})}
+                        value={filterValues.company && {value: filterValues.company && filterValues.company, label: filterValues.company && filterValues.company}}
+                    />
+                }
+                {
+                    filters.categories &&
+                    <Select 
+                        options={[{value: '', label: 'All Categories'}, ...filters.categories]} 
+                        placeholder={<span>Select Job Category <strong>{filters.categories.length}</strong></span>}
+                        classNamePrefix={'dej-select'}
+                        className="custom-select"
+                        onChange={(e)=> onCategoriesChanged({predicted_de_job_category: [e.value]})}
+                        value={filterValues.predicted_de_job_category[0] && {value: filterValues.predicted_de_job_category[0], label: filterValues.predicted_de_job_category[0]}}
+                    />
+                }
+            </div>
+            <div className="inline-flex items-center gap-2">
+                <strong className="text-3xl font-semibold">{totalJobs > 9 ? totalJobs : '0' + totalJobs}</strong>
+                <span>Total Open Roles</span>
+            </div>
+        </div>
+    )
+}
+
+const JobListing = ({data})=> {
+
+    return (
+        <div className="relative grid grid-cols-4 gap-2">
+            {
+                data?.map((item, index)=> (
+                    <div className="w-full flex flex-col gap-4 relative bg-white p-4 rounded-3xl overflow-hidden" key={'jobs-' + index}>
+
+                        <div className="relative w-full gap-4 flex items-center justify-between">
+                            <div className="inline-block items-center bg-[#F6F6F6] font-medium px-3 py-1 rounded-2xl text-sm">{moment(item.inserted_date).format('LL')}</div>
+                            <div className="w-6 h-6 rounded-full overflow-hidden relative inline-block">
+                                <img src="/linkedin-icon.png" alt="LinkedIn Icon" className="w-full h-full object-cover" />
+                            </div>
+                        </div>
+
+                        <div className="block relative w-full flex-1">
+                            {
+                                item.company && 
+                                <p className="block text-sm">{item.company}</p>
+                            }
+
+                            {
+                                item.job_title && 
+                                <div className="w-full flex item-start gap-5 mt-1 justify-between">
+                                    <h3 className="block font-medium text-start flex-1">{item.job_title}</h3>
+
+                                    {
+                                        item.logo_url &&
+                                        <div className="w-13 h-13 rounded-full overflow-hidden border-3 border-[#f6f6f6]">
+                                            <img src={item.logo_url} alt={item.company} className="w-full h-full object-cover" />
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+
+                        <div className="flex w-full item-center gap-1 flex-wrap">
+                            {
+                                item.status &&
+                                <div className="inline-block items-center bg-[#0a66c217] text-[#0A66C2] font-medium px-3 py-1 rounded-2xl text-sm">{item.status}</div>
+                            }
+                            {
+                                item.predicted_de_job_category &&
+                                <div className="block">
+                                    <div className="inline-block items-center bg-[#b68a3512] text-[#B68A35] font-medium px-3 py-1 rounded-2xl text-sm">{item.predicted_de_job_category}</div>
+                                </div>
+                            }
+                         
+                        </div>
+
+                        <hr className="border-[#f6f6f6]" />
+
+                        <div className="w-full flex items-center justify-between gap-5">
+                            {
+                                item.predicted_location &&
+                                <div className="inline-flex gap-2 items-center">
+                                    <FiMapPin />
+                                    <p className="text-sm">{item.predicted_location}</p>
+                                </div>
+                            }
+
+                            {
+                                item.predicted_link && 
+                                <a href={item.predicted_link} referrerPolicy={'no-referrer'} className="btn-regular" title="Details" target={'_blank'}>
+                                    <span>Details</span>
+                                </a>
+                            }
+                            
+                            
+                        </div>
+
+                    </div>
+                ))
+            }
+        </div>
+    )
+}
+
+const JobSearchValues = ({filterData})=> {
+
+    const setSearchValue = useSetAtom(searchFilterAtom)
+
+    const onFilterReset = (value)=> {
+        setSearchValue((data)=> {
+            return {
+                ...data,
+                ...value
+            }
+        })
+    }
+
+    return (
+        <div className="w-full flex flex-wrap gap-2 items-start mb-6">
+            {
+                filterData.keywords &&
+                <div onClick={()=> onFilterReset({keywords: ''})} className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75">
+                    <span>Keyword: </span>
+                    {
+                        <span>{filterData.keywords}</span>
+                    }
+                    <IoIosClose />
+                </div>
+            }
+            {
+                filterData.location &&
+                <div onClick={()=> onFilterReset({location: ''})} className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75">
+                    <span>Location: </span>
+                    {
+                        <span>{filterData.location}</span>
+                    }
+                    <IoIosClose />
+                </div>
+            }
+            {
+                filterData.company &&
+                <div onClick={()=> onFilterReset({company: ''})} className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75">
+                    <span>Company: </span>
+                    {
+                        <span>{filterData.company}</span>
+                    }
+                    <IoIosClose />
+                </div>
+            }
+            {
+                filterData.predicted_de_job_category &&
+
+                filterData.predicted_de_job_category?.map((item, index)=> (
+                    <div onClick={()=> onFilterReset({predicted_de_job_category: filterData.predicted_de_job_category.filter(el=> el !== item)})} key={'selected-cat-' + index} className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75">
+                        {
+                            <span>{item}</span>
+                        }
+                        <IoIosClose />
+                    </div>
+                ))
+                
+            }
+        </div>
+    )
+}
+
+const HomeJobListing = ({data}) => {
+
+  const [jobs, setJobs] = useAtom(jobsListingAtom)
+  const [searchValues, setSearchValue] = useAtom(searchFilterAtom)
+
+  const onFilterChanged = useCallback((value)=> {
+    setSearchValue((data)=> {
+        return {
+            ...data,
+            ...value,
+        }
+    })
+  }, [searchValues])
+
+  useEffect(()=> {  
+
+    const searchedJobs = data?.jobs?.filter((item)=> 
+        item.job_title.match(new RegExp(`(${searchValues?.keywords})`, "gi")) && 
+        item?.predicted_location.match(new RegExp(`(${searchValues?.location})`, "gi")) &&
+        item?.company.match(new RegExp(`(${searchValues?.company})`, "gi")) 
+    )
+    setJobs(searchedJobs)
+
+    if(searchValues?.predicted_de_job_category.length > 0) setJobs((data)=> data.filter(item=> searchValues?.predicted_de_job_category?.includes(item.predicted_de_job_category)))
+
+  }, [searchValues])
+
+
+  useEffect(()=> {
+    setJobs(data.jobs)
+  }, [])
+
+  return (
+    <motion.section 
+    id="jobs" 
+    initial={{opacity: 0}}
+    animate={{opacity: 1}}
+    exit={{ opacity: 0}}
+    transition={{duration: 0.8, type: 'tween', delay: 0.2}}
+    className="block w-full overflow-hidden relative pb-[7rem] bg-[var(--bg-color)]"
+    >
+        <JobCatergoryList data={data} onCategoryClick={onFilterChanged} activeCategories={searchValues?.predicted_de_job_category}/>
+        <Container>
+            <JobFilter data={data} totalJobs={jobs.length} onCategoriesChanged={onFilterChanged} onCompaniesChanged={onFilterChanged} filterValues={searchValues}/>
+            <JobSearchValues filterData={searchValues}/>
+            <JobListing data={jobs} />
+        </Container>
+    </motion.section>
+  )
+}
+
+export default HomeJobListing

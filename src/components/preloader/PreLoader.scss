@@ -1,0 +1,94 @@
+.pre_loader{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 999;
+    background-color: #FFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+
+
+#btn--yp {
+    box-sizing: content-box;
+    position: fixed;
+    z-index: 9;
+    bottom: 1em;
+    right: 1em;
+    border: solid 1em transparent;
+    width: 2.625em;
+    height: 1.25em;
+    background: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/2017/icon-yp.svg) 50%/cover content-box;
+    font: 16px/1.25 trebuchet ms, sans-serif;
+    text-indent: 200vw;
+    text-shadow: none;
+    filter: grayscale(1) drop-shadow(0 0 1px #e8e0e0);
+    transition: 0.5s;
+    white-space: nowrap;
+  }
+  #btn--yp:before {
+    box-sizing: inherit;
+    position: absolute;
+    left: 0;
+    bottom: 100%;
+    margin: 1em -0.5em;
+    padding: 0.5em;
+    width: 100%;
+    border-radius: 5px;
+    background: #e8e0e0;
+    color: #000;
+    text-align: center;
+    text-decoration: none;
+    text-indent: 0vw;
+    white-space: normal;
+    animation: float 1s ease-in-out infinite alternate;
+    content: attr(data-txt);
+  }
+  #btn--yp:hover, #btn--yp:focus {
+    outline: none;
+    filter: grayscale(0) drop-shadow(0 0 1px crimson);
+  }
+  
+  @keyframes float {
+    to {
+      transform: translateY(0.75em);
+    }
+  }
+  body {
+    text-align: center;
+  }
+  
+  svg {
+    max-width: 25em;
+    fill: none;
+    stroke: #edf5ff;
+    stroke-width: 5%;
+  }
+  
+  g {
+    transform: rotate(45deg);
+    stroke: url(#g);
+    mask: url(#m);
+  }
+  
+  #m use {
+    stroke: #fff;
+    stroke-linecap: round;
+    stroke-dasharray: var(--d1) var(--d0);
+    animation: r 1.5s cubic-bezier(0.5, -0.43, 0.5, 1.43) infinite, s 0.75s ease-in-out infinite alternate;
+  }
+  
+  @keyframes r {
+    to {
+      transform: rotate(2turn);
+    }
+  }
+  @keyframes s {
+    0%, 39% {
+      stroke-dasharray: var(--d0) var(--d1);
+    }
+  }
+}
