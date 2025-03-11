@@ -7,6 +7,7 @@ import { useAtom, atom, useSetAtom } from "jotai";
 import { searchFilterAtom } from "./HomeBanner";
 import { IoIosClose } from "react-icons/io";
 import { motion } from "framer-motion"
+import linkedInImage from "@/assets/images/linkedin-icon.png"
 
 export const jobsListingAtom = atom([])
 
@@ -26,7 +27,7 @@ const JobCatergoryList = ({data, onCategoryClick, activeCategories})=> {
 
 
     return (
-        <ul className="flex w-full items-center gap-3 overflow-x-scroll no-scrollba lg:justify-start 2xl:justify-center">
+        <ul className="flex w-full items-center gap-3 overflow-x-scroll no-scrollbar lg:justify-start 2xl:justify-center">
             {
                 data?.categories?.map((item, index)=> (
                     <li className="relative inline-block" key={'category-' + index}>
@@ -52,8 +53,8 @@ const JobFilter = ({data, totalJobs, onCompaniesChanged, onCategoriesChanged, fi
     }, [])
 
     return (
-        <div className="relative flex items-center justify-between gap-5 mt-12 mb-6">
-            <div className="inline-flex items-center gap-3">
+        <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-12 mb-6">
+            <div className="inline-flex flex flex-col w-full sm:w-auto sm:flex-row items-center gap-3">
                 {
                     filters.companies &&
                     <Select 
@@ -78,7 +79,7 @@ const JobFilter = ({data, totalJobs, onCompaniesChanged, onCategoriesChanged, fi
                 }
             </div>
             <div className="inline-flex items-center gap-2">
-                <strong className="text-3xl font-semibold">{totalJobs > 9 ? totalJobs : '0' + totalJobs}</strong>
+                <strong className="text-3xl font-semibold">{totalJobs}</strong>
                 <span>Total Open Roles</span>
             </div>
         </div>
@@ -87,17 +88,23 @@ const JobFilter = ({data, totalJobs, onCompaniesChanged, onCategoriesChanged, fi
 
 const JobListing = ({data})=> {
 
+    const [listCount, setListCount] = useState(12)
+
     return (
-        <div className="relative grid grid-cols-4 gap-2">
+        <div className="relative grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-2">
             {
                 data?.map((item, index)=> (
                     <div className="w-full flex flex-col gap-4 relative bg-white p-4 rounded-3xl overflow-hidden" key={'jobs-' + index}>
 
                         <div className="relative w-full gap-4 flex items-center justify-between">
                             <div className="inline-block items-center bg-[#F6F6F6] font-medium px-3 py-1 rounded-2xl text-sm">{moment(item.inserted_date).format('LL')}</div>
-                            <div className="w-6 h-6 rounded-full overflow-hidden relative inline-block">
-                                <img src="/linkedin-icon.png" alt="LinkedIn Icon" className="w-full h-full object-cover" />
-                            </div>
+                            
+                            {
+                                item.logo_url &&
+                                <div className="w-13 h-13 rounded-full overflow-hidden border-3 border-[#f6f6f6]">
+                                    <img src={item.logo_url} alt={item.company} className="w-full h-full object-cover" />
+                                </div>
+                            }
                         </div>
 
                         <div className="block relative w-full flex-1">
@@ -111,21 +118,15 @@ const JobListing = ({data})=> {
                                 <div className="w-full flex item-start gap-5 mt-1 justify-between">
                                     <h3 className="block font-medium text-start flex-1">{item.job_title}</h3>
 
-                                    {
-                                        item.logo_url &&
-                                        <div className="w-13 h-13 rounded-full overflow-hidden border-3 border-[#f6f6f6]">
-                                            <img src={item.logo_url} alt={item.company} className="w-full h-full object-cover" />
-                                        </div>
-                                    }
                                 </div>
                             }
                         </div>
 
                         <div className="flex w-full item-center gap-1 flex-wrap">
-                            {
+                            {/* {
                                 item.status &&
                                 <div className="inline-block items-center bg-[#0a66c217] text-[#0A66C2] font-medium px-3 py-1 rounded-2xl text-sm">{item.status}</div>
-                            }
+                            } */}
                             {
                                 item.predicted_de_job_category &&
                                 <div className="block">
@@ -248,7 +249,7 @@ const HomeJobListing = ({data}) => {
     )
     setJobs(searchedJobs)
 
-    if(searchValues?.predicted_de_job_category.length > 0) setJobs((data)=> data.filter(item=> searchValues?.predicted_de_job_category?.includes(item.predicted_de_job_category)))
+    if(searchValues?.predicted_de_job_category.length > 0) setJobs((data)=> data.filter(item=> searchValues?.predicted_de_job_category?.includes(item.predicted_de_job_category)).reverse())
 
   }, [searchValues])
 

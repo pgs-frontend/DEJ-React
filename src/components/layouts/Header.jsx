@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router"
 import Container from "./Container"
 import { LuMail } from "react-icons/lu";
 import { useEffect, useState } from "react";
+import logoImage from "@/assets/images/logo.png"
 
 const navList = [
     {
@@ -9,16 +10,16 @@ const navList = [
         title: 'Find Jobs',
         link: '/'
     },
-    {
-        id: 'nav-02',
-        title: 'About',
-        link: '/about'
-    },
-    {
-        id: 'nav-03',
-        title: 'Contact',
-        link: '/contact'
-    }
+    // {
+    //     id: 'nav-02',
+    //     title: 'About',
+    //     link: '/about'
+    // },
+    // {
+    //     id: 'nav-03',
+    //     title: 'Contact',
+    //     link: '/contact'
+    // }
 ]
 
 const Header = () => {
@@ -44,8 +45,8 @@ const Header = () => {
         <Container>
             <div className="w-full flex flex-row gap-6 items-center justify-between h-[6rem] transition-all">
 
-                <Link href="/" title="Digital Economy Jobs" className="inline-block w-auto h-15">
-                    <img src="/logo.png" alt="Digital Economy Jobs Logo" className="w-auto h-full object-contain object-center" />
+                <Link href="/" title="Digital Economy Jobs" className="inline-block w-auto h-[2.3rem] sm:h-[3rem]">
+                    <img src={logoImage} alt="Digital Economy Jobs Logo" className="w-auto h-full object-contain object-center" />
                 </Link>
 
                 <nav className="inline-block">

@@ -86,6 +86,10 @@ header{
     &.sm{
         font-size: 3.75rem;
     }
+
+    @media only screen and (max-width: 767px){
+        font-size: 2.5rem;
+    }
 }
 
 .outline-btn{
@@ -144,12 +148,34 @@ header{
     padding-inline-start: 1.5rem;
     width: 40rem;
 
+    @media only screen and (max-width: 767px){
+        flex-wrap: wrap;
+        width: 22.5rem;
+        padding: 1rem;
+
+        &>span{
+            display: none;
+        }
+    }
+
     .input_{
         position: relative;
         display: inline-flex;
         align-items: center;
         gap: 0.5rem;
         flex: 1;
+
+        @media only screen and (max-width: 767px){
+
+            height: 3rem;
+
+           &:nth-child(1){
+            width: 100%;
+           flex: none;
+           border-bottom: 1px solid #dadada98;
+           }
+        }
+
         svg{
             position: relative;
         }
@@ -227,6 +253,11 @@ header{
 }
 
 .custom-select{
+
+    @media only screen and (max-width: 767px){
+        width: 100%;
+    }
+
     .dej-select{
         &__control{
             min-height: 3rem;
@@ -255,6 +286,11 @@ header{
                 align-items: center;
                 gap: 0.5rem;
 
+                @media only screen and (max-width: 767px){
+                    justify-content: space-between;
+                    width: 100%;
+                }
+
                 strong{
                     background-color: var(--text-color);
                     width: 1.75rem;
@@ -275,6 +311,7 @@ header{
         }
 
         &__dropdown-indicator{
+       
             svg{
                 stroke: var(--text-color);
                 fill: var(--text-color);
@@ -548,4 +585,21 @@ header{
       stroke-dasharray: var(--d0) var(--d1);
     }
   }
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+@media only screen and (max-width: 767px){
+    .container{
+        padding-inline: 1.25rem;
+    }
 }

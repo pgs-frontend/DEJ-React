@@ -5,6 +5,7 @@ import Select from 'react-select'
 import locations from "../../store/locations";
 import { atom, useSetAtom } from "jotai";
 import { motion } from "framer-motion"
+import bannerVideo from "@/assets/images/banner-video.mp4"
 
 export const searchFilterAtom = atom({
     keywords: '', 
@@ -68,7 +69,7 @@ const HomeBanner = () => {
         transition={{duration: 0.8, type: 'tween', delay: 0.2}}
         >
             <video autoPlay playsInline loop muted className='absolute top-0 left-0 w-full h-full object-cover opacity-20'>
-                <source src='/banner-video.mp4' type='video/mp4'/>
+                <source src={bannerVideo} type='video/mp4'/>
             </video>
         </motion.div>
 
@@ -91,13 +92,14 @@ const HomeBanner = () => {
                         <button className='outline-btn' type="button" onClick={scrollToJobListing}>
                             <span>View Jobs</span>
                         </button>
-                        <button className='icon-btn' type="button">
+                        {/* <button className='icon-btn' type="button">
                             <FiArrowUpRight />
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             </div>
             <div className='w-full relative flex items-center justify-center banner-search-bar'>
+
                 <form className="search-jobs-form" onSubmit={onSearch}>
                     <div className="input_">
                         <LuSearch />

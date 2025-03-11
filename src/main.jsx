@@ -4,6 +4,7 @@ import { RouterProvider, createBrowserHistory, createRouter } from '@tanstack/re
 import { routeTree } from './routeTree.gen'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { HelmetProvider } from 'react-helmet-async'
+import './assets/scss/app.scss'
 
 const browserHistory = createBrowserHistory()
 const queryClient = new QueryClient()
@@ -14,6 +15,7 @@ const router = createRouter({
   history: browserHistory,
   defaultPreload: 'intent',
   defaultPreloadDelay: 100,
+  basepath: '/dej',
   context: {
     queryClient,
   }

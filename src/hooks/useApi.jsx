@@ -2,7 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import axios from "axios"
 
 // Global Axios Defaults
-axios.defaults.baseURL = 'https://web.devpgs.com/dubai-economy-jobs/api/data/en';
+axios.defaults.baseURL = 'https://2p8dfb2h29.execute-api.me-central-1.amazonaws.com/prod';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
  
 const useApi = () => {

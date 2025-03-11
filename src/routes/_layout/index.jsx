@@ -20,11 +20,12 @@ function HomePage() {
         queryKey: ['jobs-listing-query'],
         queryFn: async ()=> {
             try{
-                const res = await get('/jobs')
-                const category = jobsListing.jobs.map((item)=> item.predicted_de_job_category)
-                const company = jobsListing.jobs.map((item)=> item.company)
+                const res = await get('/')
+                const result = JSON.parse(res.body)
+                const category = result.jobs.map((item)=> item.predicted_de_job_category)
+                const company = result.jobs.map((item)=> item.company)
                 return {
-                    ...res,
+                    ...result,
                     categories: [ ...new Set(category)],
                     companies: [...new Set(company)]
                 }
