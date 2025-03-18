@@ -13,6 +13,7 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as LayoutIndexImport } from './routes/_layout/index'
+import { Route as LayoutLayoutImport } from './routes/_layout/_layout'
 import { Route as LayoutLangIndexImport } from './routes/_layout/$lang/index'
 import { Route as LayoutLangTermsServiceImport } from './routes/_layout/$lang/terms-service'
 import { Route as LayoutLangPrivacyPolicyImport } from './routes/_layout/$lang/privacy-policy'
@@ -29,6 +30,11 @@ const LayoutRoute = LayoutImport.update({
 const LayoutIndexRoute = LayoutIndexImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
+const LayoutLayoutRoute = LayoutLayoutImport.update({
+  id: '/_layout',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -72,6 +78,13 @@ declare module '@tanstack/react-router' {
       fullPath: ''
       preLoaderRoute: typeof LayoutImport
       parentRoute: typeof rootRoute
+    }
+    '/_layout/_layout': {
+      id: '/_layout/_layout'
+      path: ''
+      fullPath: ''
+      preLoaderRoute: typeof LayoutLayoutImport
+      parentRoute: typeof LayoutImport
     }
     '/_layout/': {
       id: '/_layout/'
@@ -121,6 +134,7 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface LayoutRouteChildren {
+  LayoutLayoutRoute: typeof LayoutLayoutRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
   LayoutLangAboutRoute: typeof LayoutLangAboutRoute
   LayoutLangContactRoute: typeof LayoutLangContactRoute
@@ -130,6 +144,7 @@ interface LayoutRouteChildren {
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
+  LayoutLayoutRoute: LayoutLayoutRoute,
   LayoutIndexRoute: LayoutIndexRoute,
   LayoutLangAboutRoute: LayoutLangAboutRoute,
   LayoutLangContactRoute: LayoutLangContactRoute,
@@ -142,7 +157,7 @@ const LayoutRouteWithChildren =
   LayoutRoute._addFileChildren(LayoutRouteChildren)
 
 export interface FileRoutesByFullPath {
-  '': typeof LayoutRouteWithChildren
+  '': typeof LayoutLayoutRoute
   '/': typeof LayoutIndexRoute
   '/$lang/about': typeof LayoutLangAboutRoute
   '/$lang/contact': typeof LayoutLangContactRoute
@@ -152,6 +167,7 @@ export interface FileRoutesByFullPath {
 }
 
 export interface FileRoutesByTo {
+  '': typeof LayoutLayoutRoute
   '/': typeof LayoutIndexRoute
   '/$lang/about': typeof LayoutLangAboutRoute
   '/$lang/contact': typeof LayoutLangContactRoute
@@ -163,6 +179,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_layout': typeof LayoutRouteWithChildren
+  '/_layout/_layout': typeof LayoutLayoutRoute
   '/_layout/': typeof LayoutIndexRoute
   '/_layout/$lang/about': typeof LayoutLangAboutRoute
   '/_layout/$lang/contact': typeof LayoutLangContactRoute
@@ -183,6 +200,7 @@ export interface FileRouteTypes {
     | '/$lang'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | ''
     | '/'
     | '/$lang/about'
     | '/$lang/contact'
@@ -192,6 +210,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/_layout'
+    | '/_layout/_layout'
     | '/_layout/'
     | '/_layout/$lang/about'
     | '/_layout/$lang/contact'
@@ -225,6 +244,7 @@ export const routeTree = rootRoute
     "/_layout": {
       "filePath": "_layout.jsx",
       "children": [
+        "/_layout/_layout",
         "/_layout/",
         "/_layout/$lang/about",
         "/_layout/$lang/contact",
@@ -232,6 +252,10 @@ export const routeTree = rootRoute
         "/_layout/$lang/terms-service",
         "/_layout/$lang/"
       ]
+    },
+    "/_layout/_layout": {
+      "filePath": "_layout/_layout.jsx",
+      "parent": "/_layout"
     },
     "/_layout/": {
       "filePath": "_layout/index.jsx",
