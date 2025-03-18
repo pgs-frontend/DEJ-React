@@ -1,10 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createBrowserHistory, createRouter } from '@tanstack/react-router'
 import { routeTree } from './routeTree.gen'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { HelmetProvider } from 'react-helmet-async'
 import './assets/scss/app.scss'
+import './lang/i18n'
 
 const browserHistory = createBrowserHistory()
 const queryClient = new QueryClient()
@@ -15,7 +16,6 @@ const router = createRouter({
   history: browserHistory,
   defaultPreload: 'intent',
   defaultPreloadDelay: 100,
-  basepath: '/dej',
   context: {
     queryClient,
   }

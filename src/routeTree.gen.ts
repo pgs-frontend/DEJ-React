@@ -13,10 +13,11 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as LayoutImport } from './routes/_layout'
 import { Route as LayoutIndexImport } from './routes/_layout/index'
-import { Route as LayoutTermsServiceImport } from './routes/_layout/terms-service'
-import { Route as LayoutPrivacyPolicyImport } from './routes/_layout/privacy-policy'
-import { Route as LayoutContactImport } from './routes/_layout/contact'
-import { Route as LayoutAboutImport } from './routes/_layout/about'
+import { Route as LayoutLangIndexImport } from './routes/_layout/$lang/index'
+import { Route as LayoutLangTermsServiceImport } from './routes/_layout/$lang/terms-service'
+import { Route as LayoutLangPrivacyPolicyImport } from './routes/_layout/$lang/privacy-policy'
+import { Route as LayoutLangContactImport } from './routes/_layout/$lang/contact'
+import { Route as LayoutLangAboutImport } from './routes/_layout/$lang/about'
 
 // Create/Update Routes
 
@@ -31,27 +32,33 @@ const LayoutIndexRoute = LayoutIndexImport.update({
   getParentRoute: () => LayoutRoute,
 } as any)
 
-const LayoutTermsServiceRoute = LayoutTermsServiceImport.update({
-  id: '/terms-service',
-  path: '/terms-service',
+const LayoutLangIndexRoute = LayoutLangIndexImport.update({
+  id: '/$lang/',
+  path: '/$lang/',
   getParentRoute: () => LayoutRoute,
 } as any)
 
-const LayoutPrivacyPolicyRoute = LayoutPrivacyPolicyImport.update({
-  id: '/privacy-policy',
-  path: '/privacy-policy',
+const LayoutLangTermsServiceRoute = LayoutLangTermsServiceImport.update({
+  id: '/$lang/terms-service',
+  path: '/$lang/terms-service',
   getParentRoute: () => LayoutRoute,
 } as any)
 
-const LayoutContactRoute = LayoutContactImport.update({
-  id: '/contact',
-  path: '/contact',
+const LayoutLangPrivacyPolicyRoute = LayoutLangPrivacyPolicyImport.update({
+  id: '/$lang/privacy-policy',
+  path: '/$lang/privacy-policy',
   getParentRoute: () => LayoutRoute,
 } as any)
 
-const LayoutAboutRoute = LayoutAboutImport.update({
-  id: '/about',
-  path: '/about',
+const LayoutLangContactRoute = LayoutLangContactImport.update({
+  id: '/$lang/contact',
+  path: '/$lang/contact',
+  getParentRoute: () => LayoutRoute,
+} as any)
+
+const LayoutLangAboutRoute = LayoutLangAboutImport.update({
+  id: '/$lang/about',
+  path: '/$lang/about',
   getParentRoute: () => LayoutRoute,
 } as any)
 
@@ -66,39 +73,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutImport
       parentRoute: typeof rootRoute
     }
-    '/_layout/about': {
-      id: '/_layout/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof LayoutAboutImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/contact': {
-      id: '/_layout/contact'
-      path: '/contact'
-      fullPath: '/contact'
-      preLoaderRoute: typeof LayoutContactImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/privacy-policy': {
-      id: '/_layout/privacy-policy'
-      path: '/privacy-policy'
-      fullPath: '/privacy-policy'
-      preLoaderRoute: typeof LayoutPrivacyPolicyImport
-      parentRoute: typeof LayoutImport
-    }
-    '/_layout/terms-service': {
-      id: '/_layout/terms-service'
-      path: '/terms-service'
-      fullPath: '/terms-service'
-      preLoaderRoute: typeof LayoutTermsServiceImport
-      parentRoute: typeof LayoutImport
-    }
     '/_layout/': {
       id: '/_layout/'
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof LayoutIndexImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/$lang/about': {
+      id: '/_layout/$lang/about'
+      path: '/$lang/about'
+      fullPath: '/$lang/about'
+      preLoaderRoute: typeof LayoutLangAboutImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/$lang/contact': {
+      id: '/_layout/$lang/contact'
+      path: '/$lang/contact'
+      fullPath: '/$lang/contact'
+      preLoaderRoute: typeof LayoutLangContactImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/$lang/privacy-policy': {
+      id: '/_layout/$lang/privacy-policy'
+      path: '/$lang/privacy-policy'
+      fullPath: '/$lang/privacy-policy'
+      preLoaderRoute: typeof LayoutLangPrivacyPolicyImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/$lang/terms-service': {
+      id: '/_layout/$lang/terms-service'
+      path: '/$lang/terms-service'
+      fullPath: '/$lang/terms-service'
+      preLoaderRoute: typeof LayoutLangTermsServiceImport
+      parentRoute: typeof LayoutImport
+    }
+    '/_layout/$lang/': {
+      id: '/_layout/$lang/'
+      path: '/$lang'
+      fullPath: '/$lang'
+      preLoaderRoute: typeof LayoutLangIndexImport
       parentRoute: typeof LayoutImport
     }
   }
@@ -107,19 +121,21 @@ declare module '@tanstack/react-router' {
 // Create and export the route tree
 
 interface LayoutRouteChildren {
-  LayoutAboutRoute: typeof LayoutAboutRoute
-  LayoutContactRoute: typeof LayoutContactRoute
-  LayoutPrivacyPolicyRoute: typeof LayoutPrivacyPolicyRoute
-  LayoutTermsServiceRoute: typeof LayoutTermsServiceRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
+  LayoutLangAboutRoute: typeof LayoutLangAboutRoute
+  LayoutLangContactRoute: typeof LayoutLangContactRoute
+  LayoutLangPrivacyPolicyRoute: typeof LayoutLangPrivacyPolicyRoute
+  LayoutLangTermsServiceRoute: typeof LayoutLangTermsServiceRoute
+  LayoutLangIndexRoute: typeof LayoutLangIndexRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
-  LayoutAboutRoute: LayoutAboutRoute,
-  LayoutContactRoute: LayoutContactRoute,
-  LayoutPrivacyPolicyRoute: LayoutPrivacyPolicyRoute,
-  LayoutTermsServiceRoute: LayoutTermsServiceRoute,
   LayoutIndexRoute: LayoutIndexRoute,
+  LayoutLangAboutRoute: LayoutLangAboutRoute,
+  LayoutLangContactRoute: LayoutLangContactRoute,
+  LayoutLangPrivacyPolicyRoute: LayoutLangPrivacyPolicyRoute,
+  LayoutLangTermsServiceRoute: LayoutLangTermsServiceRoute,
+  LayoutLangIndexRoute: LayoutLangIndexRoute,
 }
 
 const LayoutRouteWithChildren =
@@ -127,50 +143,61 @@ const LayoutRouteWithChildren =
 
 export interface FileRoutesByFullPath {
   '': typeof LayoutRouteWithChildren
-  '/about': typeof LayoutAboutRoute
-  '/contact': typeof LayoutContactRoute
-  '/privacy-policy': typeof LayoutPrivacyPolicyRoute
-  '/terms-service': typeof LayoutTermsServiceRoute
   '/': typeof LayoutIndexRoute
+  '/$lang/about': typeof LayoutLangAboutRoute
+  '/$lang/contact': typeof LayoutLangContactRoute
+  '/$lang/privacy-policy': typeof LayoutLangPrivacyPolicyRoute
+  '/$lang/terms-service': typeof LayoutLangTermsServiceRoute
+  '/$lang': typeof LayoutLangIndexRoute
 }
 
 export interface FileRoutesByTo {
-  '/about': typeof LayoutAboutRoute
-  '/contact': typeof LayoutContactRoute
-  '/privacy-policy': typeof LayoutPrivacyPolicyRoute
-  '/terms-service': typeof LayoutTermsServiceRoute
   '/': typeof LayoutIndexRoute
+  '/$lang/about': typeof LayoutLangAboutRoute
+  '/$lang/contact': typeof LayoutLangContactRoute
+  '/$lang/privacy-policy': typeof LayoutLangPrivacyPolicyRoute
+  '/$lang/terms-service': typeof LayoutLangTermsServiceRoute
+  '/$lang': typeof LayoutLangIndexRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/_layout': typeof LayoutRouteWithChildren
-  '/_layout/about': typeof LayoutAboutRoute
-  '/_layout/contact': typeof LayoutContactRoute
-  '/_layout/privacy-policy': typeof LayoutPrivacyPolicyRoute
-  '/_layout/terms-service': typeof LayoutTermsServiceRoute
   '/_layout/': typeof LayoutIndexRoute
+  '/_layout/$lang/about': typeof LayoutLangAboutRoute
+  '/_layout/$lang/contact': typeof LayoutLangContactRoute
+  '/_layout/$lang/privacy-policy': typeof LayoutLangPrivacyPolicyRoute
+  '/_layout/$lang/terms-service': typeof LayoutLangTermsServiceRoute
+  '/_layout/$lang/': typeof LayoutLangIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | ''
-    | '/about'
-    | '/contact'
-    | '/privacy-policy'
-    | '/terms-service'
     | '/'
+    | '/$lang/about'
+    | '/$lang/contact'
+    | '/$lang/privacy-policy'
+    | '/$lang/terms-service'
+    | '/$lang'
   fileRoutesByTo: FileRoutesByTo
-  to: '/about' | '/contact' | '/privacy-policy' | '/terms-service' | '/'
+  to:
+    | '/'
+    | '/$lang/about'
+    | '/$lang/contact'
+    | '/$lang/privacy-policy'
+    | '/$lang/terms-service'
+    | '/$lang'
   id:
     | '__root__'
     | '/_layout'
-    | '/_layout/about'
-    | '/_layout/contact'
-    | '/_layout/privacy-policy'
-    | '/_layout/terms-service'
     | '/_layout/'
+    | '/_layout/$lang/about'
+    | '/_layout/$lang/contact'
+    | '/_layout/$lang/privacy-policy'
+    | '/_layout/$lang/terms-service'
+    | '/_layout/$lang/'
   fileRoutesById: FileRoutesById
 }
 
@@ -198,31 +225,36 @@ export const routeTree = rootRoute
     "/_layout": {
       "filePath": "_layout.jsx",
       "children": [
-        "/_layout/about",
-        "/_layout/contact",
-        "/_layout/privacy-policy",
-        "/_layout/terms-service",
-        "/_layout/"
+        "/_layout/",
+        "/_layout/$lang/about",
+        "/_layout/$lang/contact",
+        "/_layout/$lang/privacy-policy",
+        "/_layout/$lang/terms-service",
+        "/_layout/$lang/"
       ]
-    },
-    "/_layout/about": {
-      "filePath": "_layout/about.jsx",
-      "parent": "/_layout"
-    },
-    "/_layout/contact": {
-      "filePath": "_layout/contact.jsx",
-      "parent": "/_layout"
-    },
-    "/_layout/privacy-policy": {
-      "filePath": "_layout/privacy-policy.jsx",
-      "parent": "/_layout"
-    },
-    "/_layout/terms-service": {
-      "filePath": "_layout/terms-service.jsx",
-      "parent": "/_layout"
     },
     "/_layout/": {
       "filePath": "_layout/index.jsx",
+      "parent": "/_layout"
+    },
+    "/_layout/$lang/about": {
+      "filePath": "_layout/$lang/about.jsx",
+      "parent": "/_layout"
+    },
+    "/_layout/$lang/contact": {
+      "filePath": "_layout/$lang/contact.jsx",
+      "parent": "/_layout"
+    },
+    "/_layout/$lang/privacy-policy": {
+      "filePath": "_layout/$lang/privacy-policy.jsx",
+      "parent": "/_layout"
+    },
+    "/_layout/$lang/terms-service": {
+      "filePath": "_layout/$lang/terms-service.jsx",
+      "parent": "/_layout"
+    },
+    "/_layout/$lang/": {
+      "filePath": "_layout/$lang/index.jsx",
       "parent": "/_layout"
     }
   }

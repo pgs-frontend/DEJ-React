@@ -6,6 +6,7 @@ import locations from "../../store/locations";
 import { atom, useSetAtom } from "jotai";
 import { motion } from "framer-motion"
 import bannerVideo from "@/assets/images/banner-video.mp4"
+import { useTranslation } from "react-i18next";
 
 export const searchFilterAtom = atom({
     keywords: '', 
@@ -17,6 +18,7 @@ export const searchFilterAtom = atom({
 const HomeBanner = () => {
 
     const [isLoading, setIsLoading] = useState(false)
+    const {t} = useTranslation()
     const scrollToJobListing = ()=> document.getElementById('jobs').scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" })
     const [formValues, setFormValue] = useState({
         keywords: '', 
@@ -25,6 +27,7 @@ const HomeBanner = () => {
         predicted_de_job_category: []
     })
     const setSearchValue = useSetAtom(searchFilterAtom)
+
 
     const onLocationChanged = (value)=> {
         setFormValue(()=> {
@@ -56,6 +59,41 @@ const HomeBanner = () => {
         setIsLoading(false)
     }
 
+    const locations = [
+        {
+            label: t('all_emirates'),
+            value: ''
+        },
+        {
+            label: t('auh'),
+            value: 'Abu Dhabi'
+        },
+        {
+            label: t('dxb'),
+            value: 'Dubai'
+        },
+        {
+            label: t('shj'),
+            value: 'Sharjah'
+        },
+        {
+            label: t('ajm'),
+            value: 'Ajman'
+        },
+        {
+            label: t('uaq'),
+            value: 'Umm Al Quwain'
+        },
+        {
+            label: t('rak'),
+            value: 'Ras Al Khaimah'
+        },
+        {
+            label: t('fuj'),
+            value: 'Fujairah'
+        },
+    ]
+
   return (
     <section 
         id='home-banner' 
@@ -83,14 +121,14 @@ const HomeBanner = () => {
             <div className='flex flex-1 flex-col items-center justify-center relative'>
                 <div className='block text-center banner-title'>
                     <h2>
-                        <span>Find your perfect</span>
-                        <span>role in the</span>
-                        <span>Digital Economy</span>
+                        <span>{t('banner_text_1')}</span>
+                        <span>{t('banner_text_2')}</span>
+                        <span>{t('banner_text_3')}</span>
                     </h2>
 
                     <div className='w-full flex items-center justify-center gap-4 mt-5'>
-                        <button className='outline-btn' type="button" onClick={scrollToJobListing}>
-                            <span>View Jobs</span>
+                        <button  className='outline-btn' type="button" onClick={scrollToJobListing}>
+                            <span>{t('view_jobs')}</span>
                         </button>
                         {/* <button className='icon-btn' type="button">
                             <FiArrowUpRight />
@@ -103,7 +141,7 @@ const HomeBanner = () => {
                 <form className="search-jobs-form" onSubmit={onSearch}>
                     <div className="input_">
                         <LuSearch />
-                        <input type="text" placeholder="Job Title or Keyword" onChange={e=> onKeywordChanged(e.target.value)}/>
+                        <input type="text" placeholder={t('job_title_keyword')} onChange={e=> onKeywordChanged(e.target.value)}/>
                     </div>
                     {
                         locations && 
@@ -113,7 +151,7 @@ const HomeBanner = () => {
                                 <FiMapPin />
                                 <Select 
                                     options={locations} 
-                                    placeholder={'Search by Location'}
+                                    placeholder={t('search_location')}
                                     classNamePrefix={'dej-flat-select'}
                                     className="custom-select style-2 flex-1"
                                     onChange={(e)=> onLocationChanged(e.value)}

@@ -9,9 +9,10 @@
 }
 
 body{
-    font-family: 'Degular', 'san-serif';
+    font-family: 'Neue Haas Grotesk Display Pro', 'Almarai', 'san-serif';
     background-color: var(--bg-color);
     color: var(--text-color);
+    font-weight: 300;
 }
 
 a{
@@ -185,6 +186,10 @@ header{
             outline: none;
             border: none;
             width: 13.5rem;
+            
+            &::placeholder{
+                font-weight: 500;
+            }
         }
     }
 
@@ -470,6 +475,17 @@ header{
     &:hover, &:focus, &:active{
         background-color: var(--primary-color);
         color: var(--bg-color);
+    }
+
+    &.outline{
+        border: 1px solid var(--text-color);
+        background-color: transparent;
+        color: var(--text-color);
+
+        &:hover{
+            background-color: var(--text-color);
+            color: var(--bg-color);
+        }
     }
 }
 

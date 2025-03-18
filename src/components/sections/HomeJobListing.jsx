@@ -8,6 +8,7 @@ import { searchFilterAtom } from "./HomeBanner";
 import { IoIosClose } from "react-icons/io";
 import { motion } from "framer-motion"
 import linkedInImage from "@/assets/images/linkedin-icon.png"
+import { useTranslation } from "react-i18next";
 
 export const jobsListingAtom = atom([])
 
@@ -42,6 +43,7 @@ const JobCatergoryList = ({data, onCategoryClick, activeCategories})=> {
 const JobFilter = ({data, totalJobs, onCompaniesChanged, onCategoriesChanged, filterValues})=> {
 
     const [filters, setFilters] = useState({})
+    const {t} = useTranslation()
 
     useEffect(()=> {
         setFilters(()=> {
@@ -59,7 +61,7 @@ const JobFilter = ({data, totalJobs, onCompaniesChanged, onCategoriesChanged, fi
                     filters.companies &&
                     <Select 
                         options={[{value: '', label: 'All Companies'}, ...filters.companies]} 
-                        placeholder={<span>Filter by Company <strong>{filters.companies.length}</strong></span>}
+                        placeholder={<span>{t('filter_company')} <strong>{filters.companies.length}</strong></span>}
                         classNamePrefix={'dej-select'}
                         className="custom-select"
                         onChange={(e)=> onCompaniesChanged({company: e.value})}
@@ -70,7 +72,7 @@ const JobFilter = ({data, totalJobs, onCompaniesChanged, onCategoriesChanged, fi
                     filters.categories &&
                     <Select 
                         options={[{value: '', label: 'All Categories'}, ...filters.categories]} 
-                        placeholder={<span>Select Job Category <strong>{filters.categories.length}</strong></span>}
+                        placeholder={<span>{t('select_job_category')} <strong>{filters.categories.length}</strong></span>}
                         classNamePrefix={'dej-select'}
                         className="custom-select"
                         onChange={(e)=> onCategoriesChanged({predicted_de_job_category: [e.value]})}
@@ -80,7 +82,7 @@ const JobFilter = ({data, totalJobs, onCompaniesChanged, onCategoriesChanged, fi
             </div>
             <div className="inline-flex items-center gap-2">
                 <strong className="text-3xl font-semibold">{totalJobs}</strong>
-                <span>Total Open Roles</span>
+                <span>{t('total_open_roles')}</span>
             </div>
         </div>
     )
@@ -89,36 +91,45 @@ const JobFilter = ({data, totalJobs, onCompaniesChanged, onCategoriesChanged, fi
 const JobListing = ({data})=> {
 
     const [listCount, setListCount] = useState(12)
+    const {t} = useTranslation()
 
     return (
-        <div className="relative grid grid-cols-1 sm:grid-cols-3 md:grid-cols-4 gap-2">
+        <div className="relative grid grid-cols-1 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-4 gap-2">
             {
                 data?.map((item, index)=> (
                     <div className="w-full flex flex-col gap-4 relative bg-white p-4 rounded-3xl overflow-hidden" key={'jobs-' + index}>
 
                         <div className="relative w-full gap-4 flex items-center justify-between">
-                            <div className="inline-block items-center bg-[#F6F6F6] font-medium px-3 py-1 rounded-2xl text-sm">{moment(item.inserted_date).format('LL')}</div>
                             
                             {
                                 item.logo_url &&
-                                <div className="w-13 h-13 rounded-full overflow-hidden border-3 border-[#f6f6f6]">
+                                <div className="w-[4rem] h-[4rem] rounded-full overflow-hidden border-3 border-[#f6f6f6]">
                                     <img src={item.logo_url} alt={item.company} className="w-full h-full object-cover" />
                                 </div>
                             }
+
+{
+                                item.predicted_de_job_category &&
+                                <div className="block">
+                                    <div className="inline-block items-center bg-[#b68a3512] text-[#B68A35] font-medium px-3 py-1 rounded-2xl text-sm">{item.predicted_de_job_category}</div>
+                                </div>
+                            }
+
                         </div>
 
                         <div className="block relative w-full flex-1">
-                            {
-                                item.company && 
-                                <p className="block text-sm">{item.company}</p>
-                            }
+                            
 
                             {
                                 item.job_title && 
                                 <div className="w-full flex item-start gap-5 mt-1 justify-between">
-                                    <h3 className="block font-medium text-start flex-1">{item.job_title}</h3>
+                                    <h3 className="block font-bold text-start flex-1 text-lg">{item.job_title}</h3>
 
                                 </div>
+                            }
+                            {
+                                item.company && 
+                                <p className="block text-sm mt-2">{item.company}</p>
                             }
                         </div>
 
@@ -127,12 +138,10 @@ const JobListing = ({data})=> {
                                 item.status &&
                                 <div className="inline-block items-center bg-[#0a66c217] text-[#0A66C2] font-medium px-3 py-1 rounded-2xl text-sm">{item.status}</div>
                             } */}
-                            {
-                                item.predicted_de_job_category &&
-                                <div className="block">
-                                    <div className="inline-block items-center bg-[#b68a3512] text-[#B68A35] font-medium px-3 py-1 rounded-2xl text-sm">{item.predicted_de_job_category}</div>
-                                </div>
-                            }
+                            
+
+                            <div className="inline-block items-center bg-[#F6F6F6] font-medium px-3 py-1 rounded-2xl text-sm">{moment(item.inserted_date).format('LL')}</div>
+
                          
                         </div>
 
@@ -142,15 +151,15 @@ const JobListing = ({data})=> {
                             {
                                 item.predicted_location &&
                                 <div className="inline-flex gap-2 items-center">
-                                    <FiMapPin />
-                                    <p className="text-sm">{item.predicted_location}</p>
+                                    {/* <FiMapPin /> */}
+                                    <p className="text-sm truncate font-medium">{item.predicted_location}</p>
                                 </div>
                             }
 
                             {
                                 item.predicted_link && 
-                                <a href={item.predicted_link} referrerPolicy={'no-referrer'} className="btn-regular" title="Details" target={'_blank'}>
-                                    <span>Details</span>
+                                <a href={item.predicted_link} referrerPolicy={'no-referrer'} className="btn-regular outline" title="Details" target={'_blank'}>
+                                    <span>{t('details')}</span>
                                 </a>
                             }
                             
@@ -249,13 +258,14 @@ const HomeJobListing = ({data}) => {
     )
     setJobs(searchedJobs)
 
-    if(searchValues?.predicted_de_job_category.length > 0) setJobs((data)=> data.filter(item=> searchValues?.predicted_de_job_category?.includes(item.predicted_de_job_category)).reverse())
+    if(searchValues?.predicted_de_job_category.length > 0) setJobs((data)=> data.filter(item=> searchValues?.predicted_de_job_category?.includes(item.predicted_de_job_category)).sort((a,b)=> {return new Date(b.inserted_date) - new Date(a.inserted_date)}))
 
   }, [searchValues])
 
 
   useEffect(()=> {
-    setJobs(data.jobs)
+
+    setJobs(data.jobs.sort((a,b)=> {return new Date(b.inserted_date) - new Date(a.inserted_date)}))
   }, [])
 
   return (
