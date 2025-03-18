@@ -1,18 +1,18 @@
 import * as React from 'react'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
-import { useTranslation } from 'react-i18next'
+import i18n from '../lang/i18n'
 
 export const Route = createRootRoute({
   component: Root,
+  beforeLoad: ({ params }) => {
+    const lang = params.lang
+    if (lang && i18n.language !== lang && i18n.languages.includes(lang)) {
+      i18n.changeLanguage(lang)
+    }
+  },
 })
 
 function Root() {
-
-  const { i18n } = useTranslation();
-
-  React.useEffect(()=> {
-    document.dir = i18n.language === "ar" ? "rtl" : "ltr";
-  })
 
   return (
     <React.Fragment>

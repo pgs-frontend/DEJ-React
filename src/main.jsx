@@ -14,11 +14,15 @@ const queryClient = new QueryClient()
 const router = createRouter({ 
   routeTree, 
   history: browserHistory,
-  defaultPreload: 'intent',
-  defaultPreloadDelay: 100,
+  basepath: '/',
   context: {
     queryClient,
-  }
+  },
+  defaultPreload: 'idle',
+  defaultPreloadDelay: 500,
+  defaultPreloadMaxIdleTime: 3000,
+  defaultPreloadMaxIdleTimeMs: 3000,
+  defaultPreloadMaxIdleTimeMinMs: 1000,
 })
 
 

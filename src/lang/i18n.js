@@ -19,7 +19,7 @@ i18n
     },
     fallbackLng: "en",
     detection: {
-        order: ['path', 'localStorage', 'navigator'],
+        order: ['path', 'localStorage', 'navigator', ''],
         lookupFromPathIndex: 0, 
         htmlTag: document.documentElement,
         caches: ['localStorage'],
