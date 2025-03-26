@@ -14,7 +14,6 @@ const queryClient = new QueryClient()
 const router = createRouter({ 
   routeTree, 
   history: browserHistory,
-  basepath: '/',
   context: {
     queryClient,
   },

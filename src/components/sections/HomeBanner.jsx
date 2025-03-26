@@ -156,6 +156,7 @@ const HomeBanner = () => {
                                     className="custom-select style-2 flex-1"
                                     onChange={(e)=> onLocationChanged(e.value)}
                                     menuPortalTarget={document.getElementById('root')}
+                                    isSearchable={false}
                                 />
                             </div>
                         </>

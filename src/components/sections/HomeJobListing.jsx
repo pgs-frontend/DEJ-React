@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import Container from "../layouts/Container"
 import Select from 'react-select'
 import moment from "moment/moment"
@@ -9,10 +9,15 @@ import { IoIosClose } from "react-icons/io";
 import { motion } from "framer-motion"
 import linkedInImage from "@/assets/images/linkedin-icon.png"
 import { useTranslation } from "react-i18next";
+import { LuCalendarCheck } from "react-icons/lu";
 
 export const jobsListingAtom = atom([])
 
 const JobCatergoryList = ({data, onCategoryClick, activeCategories})=> {
+    const list = useMemo(()=> {
+        const result = data.categories.sort()
+        return result
+    }, [data, activeCategories])
 
     const onCategory = useCallback((value)=> {
         let list
@@ -30,7 +35,7 @@ const JobCatergoryList = ({data, onCategoryClick, activeCategories})=> {
     return (
         <ul className="flex w-full items-center gap-3 overflow-x-scroll no-scrollbar lg:justify-start 2xl:justify-center">
             {
-                data?.categories?.map((item, index)=> (
+                list?.map((item, index)=> (
                     <li className="relative inline-block" key={'category-' + index}>
                         <button className={`tag ${activeCategories?.includes(item) ? 'active' : ''}`} onClick={()=> onCategory(item)}>{item}</button>
                     </li>
@@ -45,18 +50,21 @@ const JobFilter = ({data, totalJobs, onCompaniesChanged, onCategoriesChanged, fi
     const [filters, setFilters] = useState({})
     const {t} = useTranslation()
 
+
     useEffect(()=> {
         setFilters(()=> {
+            const companies = data.companies.sort()
+            const categories = data.categories.sort()
             return {
-                companies: data.companies.map((item)=> {return {value: item, label: item}}),
-                categories: data.categories.map((item)=> {return {value: item, label: item}}),
+                companies: companies.map((item)=> {return {value: item, label: item}}),
+                categories: categories.map((item)=> {return {value: item, label: item}}),
             }
         })
     }, [])
 
     return (
         <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-12 mb-6">
-            <div className="inline-flex flex flex-col w-full sm:w-auto sm:flex-row items-center gap-3">
+            <div className="inline-flex flex flex-col w-full sm:w-auto sm:flex-row items-center gap-6 lg:gap-3">
                 {
                     filters.companies &&
                     <Select 
@@ -133,15 +141,21 @@ const JobListing = ({data})=> {
                             }
                         </div>
 
-                        <div className="flex w-full item-center gap-1 flex-wrap">
+                        <div className="flex w-full items-center gap-2">
                             {/* {
                                 item.status &&
                                 <div className="inline-block items-center bg-[#0a66c217] text-[#0A66C2] font-medium px-3 py-1 rounded-2xl text-sm">{item.status}</div>
                             } */}
                             
 
-                            <div className="inline-block items-center bg-[#F6F6F6] font-medium px-3 py-1 rounded-2xl text-sm">{moment(item.inserted_date).format('LL')}</div>
-
+                            <div className="inline-flex items-center gap-2 border border-slate-200 bg-[#f2f8ff] rounded-2xl">
+                            {/* <div className="w-6 h-6 inline-flex items-center justify-center rounded-full bg-[#595c60]">
+                                <LuCalendarCheck className="text-[#fff]" size={12} /> 
+                            </div>
+                                 */}
+                                <p className="font-medium leading-[100%] p-0 inline-block text-sm bg-text bg-[#4f5962] text-white px-2 py-2 rounded-2xl">Posted</p>
+                            <p className="font-medium leading-[100%] p-0 inline-block text-sm me-2">{moment(item.inserted_date).format('LL')}</p>
+                            </div>
                          
                         </div>
 
@@ -222,6 +236,7 @@ const JobSearchValues = ({filterData})=> {
                 filterData.predicted_de_job_category &&
 
                 filterData.predicted_de_job_category?.map((item, index)=> (
+                    item && 
                     <div onClick={()=> onFilterReset({predicted_de_job_category: filterData.predicted_de_job_category.filter(el=> el !== item)})} key={'selected-cat-' + index} className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75">
                         {
                             <span>{item}</span>
@@ -252,9 +267,9 @@ const HomeJobListing = ({data}) => {
   useEffect(()=> {  
 
     const searchedJobs = data?.jobs?.filter((item)=> 
-        item.job_title.match(new RegExp(`(${searchValues?.keywords})`, "gi")) && 
-        item?.predicted_location.match(new RegExp(`(${searchValues?.location})`, "gi")) &&
-        item?.company.match(new RegExp(`(${searchValues?.company})`, "gi")) 
+        item.job_title?.match(new RegExp(`(${searchValues?.keywords})`, "gi")) && 
+        item?.predicted_location?.match(new RegExp(`(${searchValues?.location})`, "gi")) &&
+        item?.company?.match(new RegExp(`(${searchValues?.company})`, "gi")) 
     )
     setJobs(searchedJobs)
 
