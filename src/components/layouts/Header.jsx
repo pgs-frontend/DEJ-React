@@ -77,7 +77,7 @@ const Header = () => {
                                 ))
                             } */}
                             <li className="inline-block relative">
-                                <Link to={'mailto:info@jobs.ae'} className="text-lg h-[2.25rem] w-[2.25rem] rounded-full bg-white inline-flex items-center justify-center hover:bg-primary hover:text-white">
+                                <Link to={'mailto:DE@ai.gov.ae'} className="text-lg h-[2.25rem] w-[2.25rem] rounded-full bg-white inline-flex items-center justify-center hover:bg-primary hover:text-white">
                                     <LuMail />
                                 </Link>
                             </li>
