@@ -11,6 +11,8 @@ import linkedInImage from "@/assets/images/linkedin-icon.png";
 import { useTranslation } from "react-i18next";
 import { LuCalendarCheck } from "react-icons/lu";
 import { RiShareBoxFill } from "react-icons/ri";
+import { MdAccessTime } from "react-icons/md";
+import { PiBagDuotone } from "react-icons/pi";
 
 export const jobsListingAtom = atom([]);
 
@@ -140,37 +142,124 @@ const JobListing = ({ data }) => {
   const [listCount, setListCount] = useState(12);
 
   return (
-    <div className="relative grid grid-cols-1 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-4 gap-2 ">
-      <JobCard />
-      {/* {data?.map((item, index) => (
-        <JobCardOld data={item} key={"jobs-" + index} />
-      ))} */}
+    <div className="relative grid grid-cols-1 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 ">
+      
+       {data?.map((item, index) => (
+        <JobCard data={item} key={"jobs-" + index} />
+      ))} 
     </div>
   );
 };
 
 const JobCard = ({ data }) => {
   const { t } = useTranslation();
+
+  console.log(data)
   return (
-    <div className="w-full flex flex-col gap-4 relative bg-white  rounded-2xl overflow-hidden">
-      <div className="relative w-full gap-4 flex items-center p-2 border-b-1 border-b-[#4f59621a]">
-        <div className="w-[3.8rem] h-[3.8rem] rounded-full overflow-hidden border-3 border-[#f6f6f6]">
+    <div className="w-full flex flex-col gap-3  md:gap-5 relative bg-white  rounded-2xl overflow-hidden">
+      <div className="relative w-full gap-3 flex items-center p-3 border-b-1 border-b-[#4f59621a]">
+         {data.logo_url && (
+        <div className="w-[3.7rem] h-[3.7rem] rounded-full overflow-hidden border-3 border-[#f6f6f6]">
           <img
-            src="https://media.licdn.com/dms/image/v2/D4D0BAQExA2YM1bXNOA/company-logo_100_100/B4DZUC30qcHYAI-/0/1739509943467/edgegroup_logo?e=2147483647&v=beta&t=lni0oS64ZRAwefrdWy36xGjPL7CjI6itWgfbNM2De1Y"
+             src={data.logo_url}
+              alt={data.company}
             className="w-full h-full object-cover"
           />
         </div>
+        )}
 
-        <div className="relative flex justify-between">
-          
-          <a href="#" className="flex">
+        <div className="relative flex justify-between items-center flex-1">
+          <div className="flex flex-col">
+            {data.company && (
+            <h3 className="m-0 font-semibold text-[1.1rem] leading-[100%] text-[#2F2F2F]">
+              {data.company}
+            </h3>
+            )}
+            {data.company_info?.sector && (
+            <div className="text-sm opacity-60 font-medium">
+              {data.company_info.sector}
+            </div>
+            )}
+          </div>
+
+          <a href="#" className="shareBtn">
             <RiShareBoxFill />
           </a>
-
         </div>
       </div>
 
-      <div className="relative flex justify-between h-5"></div>
+      <div className="relative px-3 flex-1">
+        {data.job_title && (
+        <h3 className="m-0 mb-3 font-bold text-[1.3rem] leading-[100%] text-[#2F2F2F]">
+          {data.job_title}
+        </h3>
+         )}
+        {data.predicted_de_job_category && (
+        <div className="smTag  w-[auto] inline-flex rounded-2xl text-sm font-medium leading-[100%] mb-2">
+           {data.predicted_de_job_category}
+        </div>
+        )}
+        <div className="text-[.95rem] textBox" style={{ "--ellipsRow": 3 }}>
+          An experienced consulting professional, you will be a thought leader
+          in the CMT industry and a key advisor to defining solutions and will
+          be on point to help...
+        </div>
+
+        <div className="flex flex-wrap gap-2 mt-3 md:mt-5 items-center">
+          <div className="smTag bgColor1  w-[auto] inline-flex rounded-2xl text-sm font-medium leading-[100%] mb-1">
+            <div className="iconBox">
+              <MdAccessTime />
+            </div>
+            <span>Full Time</span>
+          </div>
+          <div className="smTag bgColor1  w-[auto] inline-flex rounded-2xl text-sm font-medium leading-[100%] mb-1">
+            <div className="iconBox">
+              <PiBagDuotone />
+            </div>
+            <span>Entry Level</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="relative px-3 lg:py-3 flex flex-col gap-2">
+       <div className="dateWrap ">
+          <div className="dateBox">
+                <span>Posted</span>20.04.2025
+          </div>
+          <div className="line"></div>
+          <div className="dateBox">
+            <span>Expires</span>30.06.2025
+          </div>
+       </div>
+
+       <div className="w-full flex items-center justify-between gap-5">
+        {data.predicted_location && (
+          <div className="inline-flex gap-1 items-center text-(--gray)">
+            <div className="opacity-[.5]">
+             <FiMapPin  /> 
+           </div>
+            <p className="text-sm truncate font-medium">
+              {data.predicted_location}
+            </p>
+          </div>
+        )}
+
+        {data.predicted_link && (
+          <a
+            href={data.predicted_link}
+            referrerPolicy={"no-referrer"}
+            className="btn-regular outline"
+            title="Details"
+            target={"_blank"}
+          >
+            <span>{t("details")}</span>
+          </a>
+        )}
+      </div>
+       </div>
+
+
+
     </div>
   );
 };
