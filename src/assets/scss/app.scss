@@ -674,6 +674,13 @@ header {
   -webkit-line-clamp: var(--ellipsRow);
   -webkit-box-orient: vertical;
   overflow: hidden;
+  > * {
+    margin-bottom: 0.5rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .smTag {
@@ -730,4 +737,12 @@ header {
       opacity: 0.7;
     }
   }
+}
+
+.bg-background {
+  background-color: #fff;
+}
+
+button {
+  cursor: pointer;
 }
