@@ -1,22 +1,18 @@
 /** @type {import('tailwindcss').Config} */
 
 export default {
- content: [
-    "./index.html",
-    "./src/**/*.{js,jsx,ts,tsx}",
-  ],
+  content: ["./src/**/*.{js,ts,jsx,tsx,html}"],
   theme: {
     extend: {
       fontFamily: {
         body: ["Degular", "ui-sans-serif", "system-ui", "sans-serif"],
       },
       colors: {
-        primary: 'var(--primary-color)',
-        secondary: 'var(--secondary-colo)',
-        textColor: 'var(--text-color)',
-        white: '#FFF'
-      }
-    }
+        primary: "var(--primary-color)",
+        secondary: "var(--secondary-colo)",
+        textColor: "var(--text-color)",
+        white: "#FFF",
+      },
+    },
   },
-}
-
+};
