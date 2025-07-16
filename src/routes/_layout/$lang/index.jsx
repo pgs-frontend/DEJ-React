@@ -1,46 +1,86 @@
-import { createFileRoute } from '@tanstack/react-router'
-import HomeBanner from '../../../components/sections/HomeBanner'
-import { Helmet } from 'react-helmet-async'
-import { useQuery } from '@tanstack/react-query'
-import useApi from '../../../hooks/useApi'
-import { jobsListing } from '../../../store/jobs'
-import HomeJobListing from '../../../components/sections/HomeJobListing'
-import PreLoader from '../../../components/preloader/PreLoader'
-import { AnimatePresence } from 'framer-motion'
+import { useState, useEffect } from "react";
 
-export const Route = createFileRoute('/_layout/$lang/')({
+import { createFileRoute } from "@tanstack/react-router";
+import HomeBanner from "../../../components/sections/HomeBanner";
+import { Helmet } from "react-helmet-async";
+import { useQuery } from "@tanstack/react-query";
+import useApi from "../../../hooks/useApi";
+import { jobsListing } from "../../../store/jobs";
+import HomeJobListing from "../../../components/sections/HomeJobListing";
+import PreLoader from "../../../components/preloader/PreLoader";
+import { AnimatePresence } from "framer-motion";
+
+import { searchFilterAtom } from "../../../components/sections/HomeBanner";
+import { useAtom } from "jotai";
+export const Route = createFileRoute("/_layout/$lang/")({
   component: HomePage,
-})
+});
 
 function HomePage() {
-  const { get } = useApi()
+  const { get } = useApi();
+
+  const [location, setLocation] = useState({});
+
+  const [searchValues, setSearchValue] = useAtom(searchFilterAtom);
 
   const { data, isLoading, isError, isRefetching } = useQuery({
-    queryKey: ['jobs-listing-query'],
+    queryKey: ["jobs-listing-query"],
     queryFn: async () => {
       try {
-        const res = await get('/')
-        const result = JSON.parse(res.body)
-        const category = result.jobs.map(
-          (item) => item.predicted_de_job_category,
-        )
-        const company = result.jobs.map((item) => item.company)
+        const [
+          jobsResponse,
+          companiesResponse,
+          industriesResponse,
+          jobFunctionsResponse,
+          statesResponse,
+        ] = await Promise.all([
+          get("/jobs"),
+          get("/companies"),
+          get("/industries"),
+          get("/job-functions"),
+          get("/states"),
+        ]);
+
+        const jobs = await jobsResponse;
+        const companies = await companiesResponse;
+        const industries = await industriesResponse;
+        const jobFunctions = await jobFunctionsResponse;
+        const states = await statesResponse;
+
+        setLocation(states.data);
+
+        // const result = JSON.parse(res.body);
+        // const category = result.jobs.map(
+        //   (item) => item.predicted_de_job_category
+        // );
+        //    const company = result.jobs.map((item) => item.company);
+        // return {
+        //   ...result,
+        //   categories: [...new Set(category)],
+        //   companies: [...new Set(companies)],
+        // };
+
         return {
-          ...result,
-          categories: [...new Set(category)],
-          companies: [...new Set(company)],
-        }
+          jobs,
+          categories: industries.data,
+          companies: companies.data,
+          jobFunctions: jobFunctions.data,
+        };
       } catch (error) {
-        console.log(error)
+        console.log(error);
       }
     },
     refetchOnMount: true,
     staleTime: 30000,
-  })
+  });
+
+  useEffect(() => {
+    console.log(searchValues, "changed");
+  }, [searchValues]);
 
   const onCategoryClick = (value) => {
-    console.log(value)
-  }
+    console.log(value);
+  };
 
   return (
     <>
@@ -49,19 +89,19 @@ function HomePage() {
       </Helmet>
 
       <AnimatePresence>
-        {isLoading && <PreLoader key={'preloader-anim'} />}
+        {isLoading && <PreLoader key={"preloader-anim"} />}
 
         {data && (
           <>
-            <HomeBanner key={'banner-anim'} />
+            <HomeBanner key={"banner-anim"} location={location} />
             <HomeJobListing
               data={data}
               onCategoryClick={onCategoryClick}
-              key={'jobs-listing-anim'}
+              key={"jobs-listing-anim"}
             />
           </>
         )}
       </AnimatePresence>
     </>
-  )
+  );
 }

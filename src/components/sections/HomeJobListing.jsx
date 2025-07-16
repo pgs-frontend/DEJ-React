@@ -8,6 +8,7 @@ import { searchFilterAtom } from "./HomeBanner";
 import { IoIosClose } from "react-icons/io";
 import { motion } from "framer-motion";
 import linkedInImage from "@/assets/images/linkedin-icon.png";
+import jobIcon from "@/assets/images/job_icon.png";
 import { useTranslation } from "react-i18next";
 import { LuCalendarCheck } from "react-icons/lu";
 import { RiShareBoxFill } from "react-icons/ri";
@@ -26,38 +27,74 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../ui/alert-dialog"
+} from "../ui/alert-dialog";
 
 const JobCatergoryList = ({ data, onCategoryClick, activeCategories }) => {
   const list = useMemo(() => {
-    const result = data.categories.sort();
+    const result = data.sort();
     return result;
   }, [data, activeCategories]);
 
   const onCategory = useCallback(
-    (value) => {
-      let list;
-      if (activeCategories.includes(value)) {
-        list = activeCategories.filter((item) => item !== value);
+    (newItem) => {
+      let updatedList;
+
+      // Check if an item with the same 'key' as newItem already exists in activeCategories
+      const itemExists = activeCategories.some((existingItem) => {
+        return existingItem.code === newItem.code;
+      });
+
+      if (itemExists) {
+        // If it exists, filter it out (remove it)
+        updatedList = activeCategories.filter((existingItem) => {
+          if (existingItem.code !== newItem.code) {
+            return newItem;
+          }
+        });
       } else {
-        list = [...activeCategories, value];
+        // If it doesn't exist, add the new item
+        updatedList = [...activeCategories, newItem];
       }
+
       onCategoryClick({
-        predicted_de_job_category: [...new Set(list)],
+        jobFunctions: Array.from(new Set(updatedList.map((item) => item))),
       });
     },
-    [activeCategories]
+    [activeCategories, onCategoryClick]
   );
 
+  const activeCheck = (code) => {
+    const r = activeCategories.some((existingItem) => {
+      return existingItem.code === code;
+    });
+
+    return r;
+  };
+
+  // const onCategory = useCallback(
+  //   (value) => {
+  //     let list;
+  //     if (activeCategories.includes(value)) {
+  //       list = activeCategories.filter((item) => item !== value);
+  //     } else {
+  //       list = [...activeCategories, value];
+  //     }
+  //     onCategoryClick({
+  //       predicted_de_job_category: [...new Set(list)],
+  //     });
+  //   },
+  //   [activeCategories]
+  // );
+
   return (
-    <ul className="flex w-full items-center gap-3 overflow-x-scroll no-scrollbar lg:justify-start 2xl:justify-center">
+    <ul className="flex flex-wrap w-full items-center gap-3 overflow-x-scroll no-scrollbar justify-center ">
       {list?.map((item, index) => (
         <li className="relative inline-block" key={"category-" + index}>
           <button
-            className={`tag ${activeCategories?.includes(item) ? "active" : ""}`}
+            className={`tag ${activeCheck(item.code) ? "active" : ""}`}
             onClick={() => onCategory(item)}
           >
-            {item}
+            {item.name}
           </button>
         </li>
       ))}
@@ -66,7 +103,8 @@ const JobCatergoryList = ({ data, onCategoryClick, activeCategories }) => {
 };
 
 const JobFilter = ({
-  data,
+  companies,
+  categories,
   totalJobs,
   onCompaniesChanged,
   onCategoriesChanged,
@@ -77,14 +115,14 @@ const JobFilter = ({
 
   useEffect(() => {
     setFilters(() => {
-      const companies = data.companies.sort();
-      const categories = data.categories.sort();
+      // const companies = data.companies.sort();
+      // const categories = data.categories.sort();
       return {
         companies: companies.map((item) => {
-          return { value: item, label: item };
+          return { value: item.name, label: item.name };
         }),
         categories: categories.map((item) => {
-          return { value: item, label: item };
+          return { value: item.name, label: item.name };
         }),
       };
     });
@@ -150,150 +188,156 @@ const JobFilter = ({
   );
 };
 
-const JobListing = ({ data }) => {
+const JobListing = ({ jobs }) => {
   const [listCount, setListCount] = useState(12);
 
   return (
     <div className="relative grid grid-cols-1 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 ">
-      {data?.map((item, index) => (
-        <JobCard data={item} key={"jobs-" + index} />
+      {jobs?.data.map((item, index) => (
+        <JobCard job={item} key={"jobs-" + index} />
       ))}
     </div>
   );
 };
 
-const JobCard = ({ data }) => {
+const JobCard = ({ job }) => {
   const { t } = useTranslation();
 
-  
   return (
     <div className="w-full flex flex-col gap-3  md:gap-5 relative bg-white  rounded-2xl overflow-hidden">
       <div className="relative w-full gap-3 flex items-center p-3 border-b-1 border-b-[#4f59621a]">
-        {data.logo_url && (
-          <div className="w-[3.7rem] h-[3.7rem] rounded-full overflow-hidden border-3 border-[#f6f6f6]">
-            <img
-              src={data.logo_url}
-              alt={data.company}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+        <div className="w-[3.7rem] h-[3.7rem] rounded-full overflow-hidden border-3 border-[#f6f6f6]">
+          <img
+            src={job.logo_url ? job.logo_url : jobIcon}
+            alt={job.company?.name}
+            className="w-full h-full object-cover"
+          />
+        </div>
 
-        <div className="relative flex justify-between items-center flex-1">
+        <div className="relative flex justify-between items-center flex-1 gap-1">
           <div className="flex flex-col">
-            {data.company && (
-              <h3 className="m-0 font-semibold text-[1.1rem] leading-[100%] text-[#2F2F2F]">
-                {data.company}
+            {job.company.name && (
+              <h3 className="m-0 mb-[.2rem] font-semibold text-[1rem] leading-[100%] text-[#2F2F2F]">
+                {job.company.name}
               </h3>
             )}
-            {data.company_info?.sector && (
-              <div className="text-sm opacity-60 font-medium">
-                {data.company_info.sector}
+            {job.industries[0] && (
+              <div className="text-[.85rem] leading-[105%] opacity-60 font-medium">
+                {job.industries[0].name}
               </div>
             )}
           </div>
-
-          <a href="#" className="shareBtn">
-            <RiShareBoxFill />
-          </a>
+          {job.company.linkedin_url && (
+            <a
+              href={job.company.linkedin_url}
+              className="shareBtn"
+              target="_blank"
+            >
+              <RiShareBoxFill />
+            </a>
+          )}
         </div>
       </div>
 
       <div className="relative px-3 flex-1">
-        {data.job_title && (
+        {job.title && (
           <h3 className="m-0 mb-3 font-bold text-[1.3rem] leading-[100%] text-[#2F2F2F]">
-            {data.job_title}
+            {job.title}
           </h3>
         )}
-        {data.predicted_de_job_category && (
-          <div className="smTag  w-[auto] inline-flex rounded-2xl text-sm font-medium leading-[100%] mb-2">
-            {data.predicted_de_job_category}
+        {job.industries && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {job.industries.map((item, index) => (
+              <div
+                className="smTag  w-[auto] inline-flex rounded-2xl text-[.8rem] font-medium leading-[100%] "
+                key={`jobCat_${index}`}
+              >
+                {item.name}
+              </div>
+            ))}
           </div>
         )}
-       <AlertDialog>
-        <div className="text-[.95rem] " >
-          <div className="textBox" style={{ "--ellipsRow": 3 }}>
-          <p>  An experienced consulting professional, you will be a thought leader
-            in the CMT industry and a key advisor to defining solutions and will
-            be on point to help</p>
 
-          </div>
-          <AlertDialogTrigger className="text-[.95rem] text-(--brandColor2)">[...]</AlertDialogTrigger>
-        </div>
-
-   
-          
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              
-              <AlertDialogDescription className="font-medium">
-                 <p>  An experienced consulting professional, you will be a thought leader
-            in the CMT industry and a key advisor to defining solutions and will
-            be on point to help</p>
-            <p>  An experienced consulting professional, you will be a thought leader
-            in the CMT industry and a key advisor to defining solutions and will
-            be on point to help</p><p>  An experienced consulting professional, you will be a thought leader
-            in the CMT industry and a key advisor to defining solutions and will
-            be on point to help</p><p>  An experienced consulting professional, you will be a thought leader
-            in the CMT industry and a key advisor to defining solutions and will
-            be on point to help</p><p>  An experienced consulting professional, you will be a thought leader
-            in the CMT industry and a key advisor to defining solutions and will
-            be on point to help</p><p>  An experienced consulting professional, you will be a thought leader
-            in the CMT industry and a key advisor to defining solutions and will
-            be on point to help</p>
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Close</AlertDialogCancel>
-              
-            </AlertDialogFooter>
-          </AlertDialogContent>
+        <AlertDialog>
+          {job.short_description && (
+            <div className="text-[.95rem] ">
+              <div className="textBox" style={{ "--ellipsRow": 3 }}>
+                <p>{job.short_description}</p>
+              </div>
+              {job.description && (
+                <AlertDialogTrigger className="text-[.95rem] text-(--brandColor2)">
+                  [...]
+                </AlertDialogTrigger>
+              )}
+            </div>
+          )}
+          {job.description && (
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogDescription
+                  className="font-medium"
+                  dangerouslySetInnerHTML={{ __html: job.description }}
+                ></AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Close</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          )}
         </AlertDialog>
-
-        
       </div>
 
       <div className="relative px-3 pb-3 flex flex-col gap-2">
         <div className="flex flex-wrap gap-2  items-center">
-          <div className="smTag bgColor1  w-[auto] inline-flex rounded-2xl text-sm font-medium leading-[100%] mb-1">
-            <div className="iconBox">
-              <MdAccessTime />
+          {job.employment_status && (
+            <div className="smTag bgColor1  w-[auto] inline-flex rounded-2xl text-sm font-medium leading-[100%] mb-1">
+              <div className="iconBox">
+                <MdAccessTime />
+              </div>
+              <span>{job.employment_status}</span>
             </div>
-            <span>Full Time</span>
-          </div>
-          <div className="smTag bgColor1  w-[auto] inline-flex rounded-2xl text-sm font-medium leading-[100%] mb-1">
-            <div className="iconBox">
-              <PiBagDuotone />
+          )}
+          {job.experience_level && (
+            <div className="smTag bgColor1  w-[auto] inline-flex rounded-2xl text-sm font-medium leading-[100%] mb-1">
+              <div className="iconBox">
+                <PiBagDuotone />
+              </div>
+              <span>{job.experience_level}</span>
             </div>
-            <span>Entry Level</span>
-          </div>
+          )}
         </div>
 
         <div className="dateWrap ">
-          <div className="dateBox">
-            <span>Posted</span>20.04.2025
-          </div>
-          <div className="line"></div>
-          <div className="dateBox">
-            <span>Expires</span>30.06.2025
-          </div>
+          {job.list_date && (
+            <div className="dateBox">
+              <span>{t("posted")}</span>
+              {job.list_date}
+            </div>
+          )}
+          {job.expiration_date && (
+            <>
+              <div className="line"></div>
+              <div className="dateBox">
+                <span>{t("expires")}</span>
+                {job.expiration_date}
+              </div>
+            </>
+          )}
         </div>
 
         <div className="w-full flex items-center justify-between gap-5">
-          {data.predicted_location && (
+          {job.state.name && (
             <div className="inline-flex gap-1 items-center text-(--gray)">
               <div className="opacity-[.5]">
                 <FiMapPin />
               </div>
-              <p className="text-sm truncate font-medium">
-                {data.predicted_location}
-              </p>
+              <p className="text-sm truncate font-medium">{job.state.name}</p>
             </div>
           )}
 
-          {data.predicted_link && (
+          {job.source_url && (
             <a
-              href={data.predicted_link}
+              href={job.source_url}
               referrerPolicy={"no-referrer"}
               className="btn-regular outline"
               title="Details"
@@ -435,6 +479,26 @@ const JobSearchValues = ({ filterData }) => {
           <IoIosClose />
         </div>
       )}
+      {filterData.jobFunctions &&
+        filterData.jobFunctions?.map(
+          (item, index) =>
+            item && (
+              <div
+                onClick={() =>
+                  onFilterReset({
+                    jobFunctions: filterData.jobFunctions.filter(
+                      (el) => el !== item
+                    ),
+                  })
+                }
+                key={"selected-cat-" + index}
+                className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
+              >
+                {<span>{item.name}</span>}
+                <IoIosClose />
+              </div>
+            )
+        )}
       {filterData.predicted_de_job_category &&
         filterData.predicted_de_job_category?.map(
           (item, index) =>
@@ -460,8 +524,13 @@ const JobSearchValues = ({ filterData }) => {
   );
 };
 
+const JobPagination = ({ data }) => {
+  return <div className="w-full flex flex-wrap ">hello</div>;
+};
 const HomeJobListing = ({ data }) => {
-  const [jobs, setJobs] = useAtom(jobsListingAtom);
+  const { jobs, categories, companies, jobFunctions } = data;
+
+  const [jobList, setJobList] = useAtom(jobsListingAtom);
   const [searchValues, setSearchValue] = useAtom(searchFilterAtom);
 
   const onFilterChanged = useCallback(
@@ -476,39 +545,35 @@ const HomeJobListing = ({ data }) => {
     [searchValues]
   );
 
-  useEffect(() => {
-    const searchedJobs = data?.jobs?.filter(
-      (item) =>
-        item.job_title?.match(
-          new RegExp(`(${searchValues?.keywords})`, "gi")
-        ) &&
-        item?.predicted_location?.match(
-          new RegExp(`(${searchValues?.location})`, "gi")
-        ) &&
-        item?.company?.match(new RegExp(`(${searchValues?.company})`, "gi"))
-    );
-    setJobs(searchedJobs);
+  // useEffect(() => {
+  //   const searchedJobs = data?.jobs?.filter(
+  //     (item) =>
+  //       item.job_title?.match(
+  //         new RegExp(`(${searchValues?.keywords})`, "gi")
+  //       ) &&
+  //       item?.predicted_location?.match(
+  //         new RegExp(`(${searchValues?.location})`, "gi")
+  //       ) &&
+  //       item?.company?.match(new RegExp(`(${searchValues?.company})`, "gi"))
+  //   );
+  //   setJobs(searchedJobs);
 
-    if (searchValues?.predicted_de_job_category.length > 0)
-      setJobs((data) =>
-        data
-          .filter((item) =>
-            searchValues?.predicted_de_job_category?.includes(
-              item.predicted_de_job_category
-            )
-          )
-          .sort((a, b) => {
-            return new Date(b.inserted_date) - new Date(a.inserted_date);
-          })
-      );
-  }, [searchValues]);
+  //   if (searchValues?.predicted_de_job_category.length > 0)
+  //     setJobs((data) =>
+  //       data
+  //         .filter((item) =>
+  //           searchValues?.predicted_de_job_category?.includes(
+  //             item.predicted_de_job_category
+  //           )
+  //         )
+  //         .sort((a, b) => {
+  //           return new Date(b.inserted_date) - new Date(a.inserted_date);
+  //         })
+  //     );
+  // }, [searchValues]);
 
   useEffect(() => {
-    setJobs(
-      data.jobs.sort((a, b) => {
-        return new Date(b.inserted_date) - new Date(a.inserted_date);
-      })
-    );
+    setJobList(jobs?.data);
   }, []);
 
   return (
@@ -520,21 +585,24 @@ const HomeJobListing = ({ data }) => {
       transition={{ duration: 0.8, type: "tween", delay: 0.2 }}
       className="block w-full overflow-hidden relative pb-[7rem] bg-[var(--bg-color)]"
     >
-      <JobCatergoryList
-        data={data}
-        onCategoryClick={onFilterChanged}
-        activeCategories={searchValues?.predicted_de_job_category}
-      />
       <Container>
+        <JobCatergoryList
+          data={jobFunctions}
+          onCategoryClick={onFilterChanged}
+          activeCategories={searchValues?.jobFunctions}
+        />
+
         <JobFilter
-          data={data}
-          totalJobs={jobs.length}
+          companies={companies}
+          categories={categories}
+          totalJobs={jobs.meta.total}
           onCategoriesChanged={onFilterChanged}
           onCompaniesChanged={onFilterChanged}
           filterValues={searchValues}
         />
         <JobSearchValues filterData={searchValues} />
-        <JobListing data={jobs} />
+        <JobListing jobs={jobs} />
+        <JobPagination data={jobs.meta} />
       </Container>
     </motion.section>
   );
