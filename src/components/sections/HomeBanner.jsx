@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FiArrowUpRight, FiMapPin } from "react-icons/fi";
 import { LuSearch } from "react-icons/lu";
 import Select from "react-select";
@@ -9,16 +9,17 @@ import bannerVideo from "@/assets/images/banner-video.mp4";
 import { useTranslation } from "react-i18next";
 
 export const searchFilterAtom = atom({
-  keywords: "",
-  location: "",
-  company: "",
-  predicted_de_job_category: [],
-  jobFunctions: [],
+  keyword: "",
+  state: [],
+  company: [],
+  industries: [],
+  job_functions: [],
 });
 
 const HomeBanner = ({ location }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { t } = useTranslation();
+
   const scrollToJobListing = () =>
     document.getElementById("jobs").scrollIntoView({
       behavior: "smooth",
@@ -26,11 +27,8 @@ const HomeBanner = ({ location }) => {
       inline: "nearest",
     });
   const [formValues, setFormValue] = useState({
-    keywords: "",
-    location: "",
-    company: "",
-    predicted_de_job_category: [],
-    jobFunctions: [],
+    keyword: "",
+    state: [],
   });
   const [searchValues, setSearchValue] = useAtom(searchFilterAtom);
 
@@ -38,27 +36,63 @@ const HomeBanner = ({ location }) => {
     setFormValue(() => {
       return {
         ...formValues,
-        location: value,
+        state: value,
       };
     });
   };
 
-  const onKeywordChanged = (value) => {
-    setFormValue(() => {
-      return {
-        ...formValues,
-        keywords: value,
-      };
-    });
+  const onKeywordChanged = (newKeyword) => {
+    // Use the functional update form and spread 'prevFormValues'
+    setFormValue((prevFormValues) => ({
+      ...prevFormValues, // THIS IS THE KEY: Spreads the LATEST previous state
+      keyword: newKeyword,
+    }));
   };
+
+  useEffect(() => {
+    // Use the functional update form for setFormValue
+    setFormValue((prevFormValues) => {
+      let updatedValues = { ...prevFormValues }; // Start with the current state
+
+      // Logic for keyword reset
+      // Check if searchValues.keyword is empty or falsy AND if it differs from current formValues.keyword
+      if (!searchValues.keyword && prevFormValues.keyword !== "") {
+        updatedValues.keyword = "";
+      } else if (searchValues.keyword !== prevFormValues.keyword) {
+        // If searchValues.keyword has a value and it's different, update it
+        updatedValues.keyword = searchValues.keyword;
+      }
+
+      // Logic for state reset
+      // Check if searchValues.state is an empty array AND if it differs from current formValues.state
+      // IMPORTANT: Ensure formValues.state is an array when you set it, not a string ""
+      if (
+        Array.isArray(searchValues.state) &&
+        searchValues.state.length === 0
+      ) {
+        if (prevFormValues.state.length !== 0) {
+          // Only update if it's not already empty
+          updatedValues.state = []; // Reset to an empty array
+        }
+      } else if (
+        JSON.stringify(searchValues.state) !==
+        JSON.stringify(prevFormValues.state)
+      ) {
+        // If searchValues.state has values and it's different, update it
+        // Consider a deeper comparison for arrays if order/content matters beyond simple equality.
+        updatedValues.state = searchValues.state;
+      }
+
+      // Return the new state object
+      return updatedValues;
+    });
+  }, [searchValues]);
 
   const onSearch = async (e) => {
     e.preventDefault();
     setIsLoading(true);
 
-    if (formValues.keywords || formValues.location) {
-      // setSearchValue(formValues);
-
+    if (formValues.keyword || formValues.state) {
       setSearchValue((data) => {
         return {
           ...data,
@@ -76,47 +110,13 @@ const HomeBanner = ({ location }) => {
     setIsLoading(false);
   };
 
-  // const locations = [
-  //   {
-  //     label: t("all_emirates"),
-  //     value: "",
-  //   },
-  //   {
-  //     label: t("auh"),
-  //     value: "Abu Dhabi",
-  //   },
-  //   {
-  //     label: t("dxb"),
-  //     value: "Dubai",
-  //   },
-  //   {
-  //     label: t("shj"),
-  //     value: "Sharjah",
-  //   },
-  //   {
-  //     label: t("ajm"),
-  //     value: "Ajman",
-  //   },
-  //   {
-  //     label: t("uaq"),
-  //     value: "Umm Al Quwain",
-  //   },
-  //   {
-  //     label: t("rak"),
-  //     value: "Ras Al Khaimah",
-  //   },
-  //   {
-  //     label: t("fuj"),
-  //     value: "Fujairah",
-  //   },
-  // ];
-
   function convertToLocationFormat(data) {
     // Start with the "All Emirates" option
     const formattedLocations = [
       {
         label: t("all_emirates"),
         value: "",
+        id: "",
       },
     ];
 
@@ -148,6 +148,7 @@ const HomeBanner = ({ location }) => {
         formattedLocations.push({
           label: t(translationKey),
           value: valueString,
+          id: item.id,
         });
       }
     });
@@ -217,6 +218,7 @@ const HomeBanner = ({ location }) => {
                 type="text"
                 placeholder={t("job_title_keyword")}
                 onChange={(e) => onKeywordChanged(e.target.value)}
+                value={formValues.keyword || ""}
               />
             </div>
             {newLocations && (
@@ -229,9 +231,10 @@ const HomeBanner = ({ location }) => {
                     placeholder={t("search_location")}
                     classNamePrefix={"dej-flat-select"}
                     className="custom-select style-2 flex-1"
-                    onChange={(e) => onLocationChanged(e.value)}
+                    onChange={(e) => onLocationChanged(e)}
                     menuPortalTarget={document.getElementById("root")}
                     isSearchable={false}
+                    value={formValues.state || ""}
                   />
                 </div>
               </>

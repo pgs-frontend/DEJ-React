@@ -15,6 +15,12 @@ import { RiShareBoxFill } from "react-icons/ri";
 import { MdAccessTime } from "react-icons/md";
 import { PiBagDuotone } from "react-icons/pi";
 
+import useApi from "../../hooks/useApi";
+import { useQuery } from "@tanstack/react-query";
+import PreLoader from "../preloader/PreLoader";
+
+import { Pagination } from "@heroui/react";
+
 export const jobsListingAtom = atom([]);
 
 import {
@@ -57,7 +63,7 @@ const JobCatergoryList = ({ data, onCategoryClick, activeCategories }) => {
       }
 
       onCategoryClick({
-        jobFunctions: Array.from(new Set(updatedList.map((item) => item))),
+        job_functions: Array.from(new Set(updatedList.map((item) => item))),
       });
     },
     [activeCategories, onCategoryClick]
@@ -108,25 +114,55 @@ const JobFilter = ({
   totalJobs,
   onCompaniesChanged,
   onCategoriesChanged,
-  filterValues,
+  filterData,
 }) => {
-  const [filters, setFilters] = useState({});
+  // const [filters, setFilters] = useState({});
   const { t } = useTranslation();
 
+  // useEffect(() => {
+  //   setFilters(() => {
+
+  //     return {
+  //       companies: companies.map((item) => {
+  //         return { value: item.name, label: item.name, id: item.id };
+  //       }),
+  //       categories: categories.map((item) => {
+  //         return { value: item.name, label: item.name, id: item.id };
+  //       }),
+  //     };
+  //   });
+  // }, []);
+
+  const [filters, setFilters] = useState({ companies: [], categories: [] });
   useEffect(() => {
-    setFilters(() => {
-      // const companies = data.companies.sort();
-      // const categories = data.categories.sort();
-      return {
-        companies: companies.map((item) => {
-          return { value: item.name, label: item.name };
-        }),
-        categories: categories.map((item) => {
-          return { value: item.name, label: item.name };
-        }),
-      };
+    setFilters({
+      companies: companies.map((item) => ({
+        value: item.name,
+        label: item.name,
+        id: item.id,
+      })),
+      categories: categories.map((item) => ({
+        value: item.name,
+        label: item.name,
+        id: item.id,
+      })),
     });
-  }, []);
+  }, [companies, categories]);
+
+  // useEffect(() => {
+  //   console.log(filterData, "filterData changed");
+  // }, [filterData]);
+
+  const getCurrentSelectValue = (currentFilterValue, options) => {
+    if (currentFilterValue && currentFilterValue.id) {
+      return options.find(
+        (option) =>
+          option.value === currentFilterValue.value &&
+          option.label === currentFilterValue.label
+      );
+    }
+    return null; // No selection
+  };
 
   return (
     <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-12 mb-6">
@@ -134,7 +170,7 @@ const JobFilter = ({
         {filters.companies && (
           <Select
             options={[
-              { value: "", label: "All Companies" },
+              { value: "", label: t("all_companies"), id: "" },
               ...filters.companies,
             ]}
             placeholder={
@@ -145,19 +181,20 @@ const JobFilter = ({
             }
             classNamePrefix={"dej-select"}
             className="custom-select"
-            onChange={(e) => onCompaniesChanged({ company: e.value })}
-            value={
-              filterValues.company && {
-                value: filterValues.company && filterValues.company,
-                label: filterValues.company && filterValues.company,
-              }
+            onChange={(selectedOption) =>
+              onCompaniesChanged({ company: selectedOption })
             }
+            // Use the helper function to set the value correctly
+            value={getCurrentSelectValue(filterData.company, [
+              { value: "", label: t("all_companies"), id: "" },
+              ...filters.companies,
+            ])}
           />
         )}
         {filters.categories && (
           <Select
             options={[
-              { value: "", label: "All Categories" },
+              { value: "", label: t("all_categories"), id: "" },
               ...filters.categories,
             ]}
             placeholder={
@@ -168,15 +205,14 @@ const JobFilter = ({
             }
             classNamePrefix={"dej-select"}
             className="custom-select"
-            onChange={(e) =>
-              onCategoriesChanged({ predicted_de_job_category: [e.value] })
+            onChange={(selectedOption) =>
+              onCategoriesChanged({ industries: selectedOption })
             }
-            value={
-              filterValues.predicted_de_job_category[0] && {
-                value: filterValues.predicted_de_job_category[0],
-                label: filterValues.predicted_de_job_category[0],
-              }
-            }
+            // Use the helper function to set the value correctly
+            value={getCurrentSelectValue(filterData.industries, [
+              { value: "", label: t("all_categories"), id: "" },
+              ...filters.categories,
+            ])}
           />
         )}
       </div>
@@ -193,7 +229,7 @@ const JobListing = ({ jobs }) => {
 
   return (
     <div className="relative grid grid-cols-1 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 ">
-      {jobs?.data.map((item, index) => (
+      {jobs?.data?.map((item, index) => (
         <JobCard job={item} key={"jobs-" + index} />
       ))}
     </div>
@@ -449,44 +485,36 @@ const JobSearchValues = ({ filterData }) => {
 
   return (
     <div className="w-full flex flex-wrap gap-2 items-start mb-6">
-      {filterData.keywords && (
+      {filterData.keyword && (
         <div
-          onClick={() => onFilterReset({ keywords: "" })}
+          onClick={() => onFilterReset({ keyword: "" })}
           className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
         >
           <span>Keyword: </span>
-          {<span>{filterData.keywords}</span>}
+          {<span>{filterData.keyword}</span>}
           <IoIosClose />
         </div>
       )}
-      {filterData.location && (
+
+      {filterData.state.id && (
         <div
-          onClick={() => onFilterReset({ location: "" })}
+          onClick={() => onFilterReset({ state: [] })}
           className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
         >
           <span>Location: </span>
-          {<span>{filterData.location}</span>}
+          {<span>{filterData.state.label}</span>}
           <IoIosClose />
         </div>
       )}
-      {filterData.company && (
-        <div
-          onClick={() => onFilterReset({ company: "" })}
-          className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
-        >
-          <span>Company: </span>
-          {<span>{filterData.company}</span>}
-          <IoIosClose />
-        </div>
-      )}
-      {filterData.jobFunctions &&
-        filterData.jobFunctions?.map(
+
+      {filterData.job_functions &&
+        filterData.job_functions?.map(
           (item, index) =>
             item && (
               <div
                 onClick={() =>
                   onFilterReset({
-                    jobFunctions: filterData.jobFunctions.filter(
+                    job_functions: filterData.job_functions.filter(
                       (el) => el !== item
                     ),
                   })
@@ -499,17 +527,39 @@ const JobSearchValues = ({ filterData }) => {
               </div>
             )
         )}
-      {filterData.predicted_de_job_category &&
-        filterData.predicted_de_job_category?.map(
+
+      {filterData.company.id && (
+        <div
+          onClick={() => onFilterReset({ company: [] })}
+          className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
+        >
+          <span>Company : </span>
+          {<span>{filterData.company.label}</span>}
+          <IoIosClose />
+        </div>
+      )}
+
+      {filterData.industries.id && (
+        <div
+          onClick={() => onFilterReset({ industries: [] })}
+          className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
+        >
+          <span>Category : </span>
+          {<span>{filterData.industries.label}</span>}
+          <IoIosClose />
+        </div>
+      )}
+
+      {/* {filterData.industries &&
+        filterData.industries?.map(
           (item, index) =>
             item && (
               <div
                 onClick={() =>
                   onFilterReset({
-                    predicted_de_job_category:
-                      filterData.predicted_de_job_category.filter(
-                        (el) => el !== item
-                      ),
+                    industries: filterData.industries.filter(
+                      (el) => el !== item
+                    ),
                   })
                 }
                 key={"selected-cat-" + index}
@@ -519,19 +569,24 @@ const JobSearchValues = ({ filterData }) => {
                 <IoIosClose />
               </div>
             )
-        )}
+        )} */}
     </div>
   );
 };
 
 const JobPagination = ({ data }) => {
-  return <div className="w-full flex flex-wrap ">hello</div>;
+  return <Pagination showControls initialPage={1} total={10} />;
 };
 const HomeJobListing = ({ data }) => {
+  const { get, post } = useApi();
   const { jobs, categories, companies, jobFunctions } = data;
 
   const [jobList, setJobList] = useAtom(jobsListingAtom);
   const [searchValues, setSearchValue] = useAtom(searchFilterAtom);
+
+  useEffect(() => {
+    setJobList(jobs);
+  }, []);
 
   const onFilterChanged = useCallback(
     (value) => {
@@ -545,36 +600,68 @@ const HomeJobListing = ({ data }) => {
     [searchValues]
   );
 
-  // useEffect(() => {
-  //   const searchedJobs = data?.jobs?.filter(
-  //     (item) =>
-  //       item.job_title?.match(
-  //         new RegExp(`(${searchValues?.keywords})`, "gi")
-  //       ) &&
-  //       item?.predicted_location?.match(
-  //         new RegExp(`(${searchValues?.location})`, "gi")
-  //       ) &&
-  //       item?.company?.match(new RegExp(`(${searchValues?.company})`, "gi"))
-  //   );
-  //   setJobs(searchedJobs);
+  // const {
+  //   data: jobsData,
+  //   isLoading: isLoadingJobs,
+  //   isError: isErrorJobs,
+  //   isRefetching: isRefetchingJobs,
+  // } = useQuery({
+  //   queryKey: ["jobs-search", searchValues],
+  //   queryFn: async () => {
+  //     try {
+  //       const requestBody = {};
 
-  //   if (searchValues?.predicted_de_job_category.length > 0)
-  //     setJobs((data) =>
-  //       data
-  //         .filter((item) =>
-  //           searchValues?.predicted_de_job_category?.includes(
-  //             item.predicted_de_job_category
-  //           )
-  //         )
-  //         .sort((a, b) => {
-  //           return new Date(b.inserted_date) - new Date(a.inserted_date);
-  //         })
-  //     );
-  // }, [searchValues]);
+  //       if (searchValues.keyword) {
+  //         requestBody.keyword = searchValues.keyword;
+  //       }
+  //       if (typeof searchValues.state.id !== "undefined") {
+  //         requestBody.state = [searchValues.state.id];
+  //       }
+  //       if (typeof searchValues.company.id !== "undefined") {
+  //         requestBody.company = [searchValues.company.id];
+  //       }
+  //       if (
+  //         Array.isArray(searchValues.industries) &&
+  //         searchValues.industries.length > 0
+  //       ) {
+  //         requestBody.industries = searchValues.industries.map(
+  //           (item) => item.id
+  //         );
+  //       } else if (searchValues.industries && searchValues.industries.id) {
+  //         requestBody.industries = [searchValues.industries.id];
+  //       }
 
-  useEffect(() => {
-    setJobList(jobs?.data);
-  }, []);
+  //       if (
+  //         Array.isArray(searchValues.job_functions) &&
+  //         searchValues.job_functions.length > 0
+  //       ) {
+  //         requestBody.job_functions = searchValues.job_functions.map(
+  //           (item) => item.id
+  //         );
+  //       } else if (
+  //         searchValues.job_functions &&
+  //         searchValues.job_functions.id
+  //       ) {
+  //         requestBody.job_functions = searchValues.job_functions.id;
+  //       }
+
+  //       //    const queryParams = new URLSearchParams(requestBody).toString();
+
+  //       const response = await post(`/jobs`, requestBody);
+  //       // const response = await get(`/jobs`);
+
+  //       console.log(requestBody, "res");
+  //       setListJobs(response);
+  //       return response; // Assuming get returns parsed JSON
+  //     } catch (error) {
+  //       console.error("Error fetching jobs data:", error);
+  //       throw error;
+  //     }
+  //   },
+  //   enabled: Object.keys(searchValues).length > 0,
+  //   staleTime: 30000,
+  //   cacheTime: 5 * 60 * 1000,
+  // });
 
   return (
     <motion.section
@@ -586,23 +673,29 @@ const HomeJobListing = ({ data }) => {
       className="block w-full overflow-hidden relative pb-[7rem] bg-[var(--bg-color)]"
     >
       <Container>
+        {/* {isLoadingJobs && <PreLoader key={"preloader-anim"} />} */}
         <JobCatergoryList
           data={jobFunctions}
           onCategoryClick={onFilterChanged}
-          activeCategories={searchValues?.jobFunctions}
+          activeCategories={searchValues?.job_functions}
         />
 
         <JobFilter
           companies={companies}
           categories={categories}
-          totalJobs={jobs.meta.total}
+          totalJobs={jobList?.meta ? jobList?.meta.total : 0}
           onCategoriesChanged={onFilterChanged}
           onCompaniesChanged={onFilterChanged}
-          filterValues={searchValues}
+          filterData={searchValues}
         />
         <JobSearchValues filterData={searchValues} />
-        <JobListing jobs={jobs} />
-        <JobPagination data={jobs.meta} />
+        <JobPagination data={jobList?.meta} />
+
+        {/* {jobsData && ( */}
+        <>
+          <JobListing jobs={jobList} />
+        </>
+        {/* )} */}
       </Container>
     </motion.section>
   );

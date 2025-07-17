@@ -1,9 +1,13 @@
+const { heroui } = require("@heroui/theme");
 /** @type {import('tailwindcss').Config} */
 
 export default {
+  plugins: [heroui()],
   content: [
     "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}", // Make sure this path is correct for your project
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "// Make sure this path is correct for your project",
+    "./node_modules/@heroui/theme/dist/**/*.{js,jsx,ts,tsx}",
   ],
   theme: {
     extend: {

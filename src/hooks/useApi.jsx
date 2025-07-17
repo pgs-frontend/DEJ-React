@@ -9,9 +9,11 @@ axios.defaults.headers.post["Content-Type"] = "application/json";
 
 const useApi = () => {
   // Global API Functions
-  const get = async (url) => {
+  const get = async (url, params = {}) => {
     try {
-      const res = await axios.get(url);
+      const res = await axios.get(url, {
+        params,
+      });
       return res.data;
     } catch (error) {
       throw Error(error);

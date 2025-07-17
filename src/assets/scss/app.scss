@@ -314,9 +314,9 @@ header {
         strong {
           background-color: var(--text-color);
           min-width: 33px;
-          aspect-ratio: 1;
-          padding-inline: 5px;
-          border-radius: 50%;
+
+          padding: 3px 8px;
+          border-radius: 5px;
           display: inline-flex;
           align-items: center;
           justify-content: center;

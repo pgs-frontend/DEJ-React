@@ -10,8 +10,8 @@ import HomeJobListing from "../../../components/sections/HomeJobListing";
 import PreLoader from "../../../components/preloader/PreLoader";
 import { AnimatePresence } from "framer-motion";
 
-import { searchFilterAtom } from "../../../components/sections/HomeBanner";
-import { useAtom } from "jotai";
+// import { searchFilterAtom } from "../../../components/sections/HomeBanner";
+// import { useAtom } from "jotai";
 export const Route = createFileRoute("/_layout/$lang/")({
   component: HomePage,
 });
@@ -21,12 +21,14 @@ function HomePage() {
 
   const [location, setLocation] = useState({});
 
-  const [searchValues, setSearchValue] = useAtom(searchFilterAtom);
+  // const [searchValues, setSearchValue] = useAtom(searchFilterAtom);
 
   const { data, isLoading, isError, isRefetching } = useQuery({
     queryKey: ["jobs-listing-query"],
     queryFn: async () => {
       try {
+        // const queryParams = new URLSearchParams(searchValues).toString();
+
         const [
           jobsResponse,
           companiesResponse,
@@ -49,17 +51,6 @@ function HomePage() {
 
         setLocation(states.data);
 
-        // const result = JSON.parse(res.body);
-        // const category = result.jobs.map(
-        //   (item) => item.predicted_de_job_category
-        // );
-        //    const company = result.jobs.map((item) => item.company);
-        // return {
-        //   ...result,
-        //   categories: [...new Set(category)],
-        //   companies: [...new Set(companies)],
-        // };
-
         return {
           jobs,
           categories: industries.data,
@@ -73,10 +64,6 @@ function HomePage() {
     refetchOnMount: true,
     staleTime: 30000,
   });
-
-  useEffect(() => {
-    console.log(searchValues, "changed");
-  }, [searchValues]);
 
   const onCategoryClick = (value) => {
     console.log(value);
