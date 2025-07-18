@@ -31,6 +31,8 @@ import {
   useDisclosure,
 } from "@heroui/react";
 
+import { Card, Skeleton } from "@heroui/react";
+
 const JobCatergoryList = ({ data, onFilterChanged, activeCategories }) => {
   const list = useMemo(() => {
     const result = data.sort();
@@ -219,14 +221,51 @@ const JobFilter = ({
   );
 };
 
-const JobListing = ({ jobs }) => {
-  const [listCount, setListCount] = useState(12);
-
+const JobListing = ({ shouldShowSkeleton, jobs }) => {
   return (
     <div className="relative grid grid-cols-1 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 ">
-      {jobs?.data?.map((item, index) => (
-        <JobCard job={item} key={"jobs-" + index} />
-      ))}
+      {shouldShowSkeleton
+        ? [...Array(4)].map((_, index) => (
+            <div className="w-full flex flex-col gap-3  md:gap-5 relative bg-white  rounded-2xl overflow-hidden">
+              <div className="relative w-full gap-3 flex items-center p-3 border-b-1 border-b-[#4f59621a]">
+                <div className="w-[3.7rem] h-[3.7rem] rounded-full overflow-hidden">
+                  <Skeleton className="flex rounded-full w-full h-full" />
+                </div>
+
+                <div className="relative flex justify-between items-center flex-1 gap-1">
+                  <div className="flex flex-col flex-1 gap-1">
+                    <Skeleton className="h-3 w-4/5 rounded-lg" />
+                    <Skeleton className="h-1.5 w-3/5 rounded-lg" />
+                  </div>
+                  <Skeleton className="flex rounded-sm w-5 h-5" />
+                </div>
+              </div>
+
+              <div className="relative px-3 pb-3  flex-1 space-y-3">
+                <Skeleton className="w-5/5 rounded-sm">
+                  <div className="h-4 w-3/5 rounded-lg bg-default-200" />
+                </Skeleton>
+                <Skeleton className="w-2/5 h-4  rounded-lg bg-[#b68b351a]"></Skeleton>
+                <Skeleton className="w-5/5 h-20 rounded-lg bg-[#eee]"></Skeleton>
+                <div className="relative  flex gap-3 space-x-3 mt-10">
+                  <Skeleton className="w-2/5 h-6  rounded-2xl bg-[#0a66c21a]"></Skeleton>
+                  <Skeleton className="w-2/5 h-6  rounded-2xl bg-[#0a66c21a]"></Skeleton>
+                </div>
+                <Skeleton className="w-5/5 h-6  rounded-lg bg-[#eee]"></Skeleton>
+                <div className="relative  flex gap-3 justify-between">
+                  <Skeleton className="w-1/5 h-6  rounded-2xl ">
+                    <div className="h-full w-full  bg-default-100" />
+                  </Skeleton>
+                  <Skeleton className="w-2/5 h-6  rounded-2xl ">
+                    <div className="h-full w-full  bg-default-100" />
+                  </Skeleton>
+                </div>
+              </div>
+            </div>
+          ))
+        : jobs?.data?.map((item, index) => (
+            <JobCard job={item} key={"jobs-" + index} />
+          ))}
     </div>
   );
 };
@@ -698,6 +737,9 @@ const HomeJobListing = ({ data }) => {
   //   console.log("jj", jobsData);
   // }, [jobsData]);
 
+  // Determine if we should show the skeleton
+  const shouldShowSkeleton = isLoadingJobs || isRefetchingJobs || !jobsData;
+
   return (
     <motion.section
       id="jobs"
@@ -726,8 +768,8 @@ const HomeJobListing = ({ data }) => {
           filterData={searchValues}
         />
 
-        {isLoadingJobs && <PreLoader key={"preloader-anim"} />}
-        {jobsData && <JobListing jobs={jobList} />}
+        {/* {isLoadingJobs && <PreLoader key={"preloader-anim"} />} */}
+        <JobListing shouldShowSkeleton={shouldShowSkeleton} jobs={jobList} />
         {jobList?.meta && jobList?.meta.last_page > 1 && (
           <JobPagination
             data={jobList?.meta}
