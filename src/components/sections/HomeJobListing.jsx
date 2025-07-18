@@ -227,47 +227,7 @@ const JobListing = ({ shouldShowSkeleton, jobs }) => {
   return (
     <div className="relative grid grid-cols-1 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 ">
       {shouldShowSkeleton ? (
-        [...Array(4)].map((_, index) => (
-          <div
-            className="w-full flex flex-col gap-3  md:gap-5 relative bg-white  rounded-2xl overflow-hidden"
-            key={"skeleton" + index}
-          >
-            <div className="relative w-full gap-3 flex items-center p-3 border-b-1 border-b-[#4f59621a]">
-              <div className="w-[3.7rem] h-[3.7rem] rounded-full overflow-hidden">
-                <Skeleton className="flex rounded-full w-full h-full" />
-              </div>
-
-              <div className="relative flex justify-between items-center flex-1 gap-1">
-                <div className="flex flex-col flex-1 gap-1">
-                  <Skeleton className="h-3 w-4/5 rounded-lg" />
-                  <Skeleton className="h-1.5 w-3/5 rounded-lg" />
-                </div>
-                <Skeleton className="flex rounded-sm w-5 h-5" />
-              </div>
-            </div>
-
-            <div className="relative px-3 pb-3  flex-1 space-y-3">
-              <Skeleton className="w-5/5 rounded-sm">
-                <div className="h-4 w-3/5 rounded-lg bg-default-200" />
-              </Skeleton>
-              <Skeleton className="w-2/5 h-4  rounded-lg bg-[#b68b351a]"></Skeleton>
-              <Skeleton className="w-5/5 h-20 rounded-lg bg-[#eee]"></Skeleton>
-              <div className="relative  flex gap-3 space-x-3 mt-10">
-                <Skeleton className="w-2/5 h-6  rounded-2xl bg-[#0a66c21a]"></Skeleton>
-                <Skeleton className="w-2/5 h-6  rounded-2xl bg-[#0a66c21a]"></Skeleton>
-              </div>
-              <Skeleton className="w-5/5 h-6  rounded-lg bg-[#eee]"></Skeleton>
-              <div className="relative  flex gap-3 justify-between">
-                <Skeleton className="w-1/5 h-6  rounded-2xl ">
-                  <div className="h-full w-full  bg-default-100" />
-                </Skeleton>
-                <Skeleton className="w-2/5 h-6  rounded-2xl ">
-                  <div className="h-full w-full  bg-default-100" />
-                </Skeleton>
-              </div>
-            </div>
-          </div>
-        ))
+        [...Array(4)].map((_, index) => <JobCardSkeleton />)
       ) : jobs?.meta?.total === 0 ? (
         <div className="noData">{t("noResultsFound")}</div>
       ) : (
@@ -441,6 +401,101 @@ const JobCard = ({ job }) => {
               <span>{t("details")}</span>
             </a>
           )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const JobCardSkeleton = () => {
+  return (
+    <div className="w-full bg-white flex flex-col gap-3 md:gap-5 relative rounded-2xl overflow-hidden p-3 animate-pulse ">
+      <div className="relative w-full gap-3 flex items-center border-b-1 border-b-[#4f59621a] pb-3">
+        <Skeleton className="w-[3.7rem] h-[3.7rem] rounded-full">
+          <div className="w-[3.7rem] h-[3.7rem] rounded-full bg-default-200" />
+        </Skeleton>
+
+        <div className="relative flex justify-between items-center flex-1 gap-1">
+          <div className="flex flex-col flex-1">
+            <Skeleton className="w-3/4 rounded-lg mb-[.2rem]">
+              <div className="h-4 w-3/4 rounded-lg bg-default-200" />
+            </Skeleton>
+
+            <Skeleton className="w-1/2 rounded-lg">
+              <div className="h-3 w-1/2 rounded-lg bg-default-200" />
+            </Skeleton>
+          </div>
+
+          <Skeleton className="w-8 h-8 rounded-full">
+            <div className="w-8 h-8 rounded-full bg-default-200" />
+          </Skeleton>
+        </div>
+      </div>
+
+      <div className="relative px-0 flex-1">
+        <Skeleton className="w-full rounded-lg mb-3">
+          <div className="h-6 w-full rounded-lg bg-default-300" />
+        </Skeleton>
+
+        <div className="flex flex-wrap gap-1 mb-2">
+          <Skeleton className="w-20 h-6 rounded-2xl">
+            <div className="w-20 h-6 rounded-2xl bg-default-200" />
+          </Skeleton>
+          <Skeleton className="w-24 h-6 rounded-2xl">
+            <div className="w-24 h-6 rounded-2xl bg-default-200" />
+          </Skeleton>
+          <Skeleton className="w-16 h-6 rounded-2xl">
+            <div className="w-16 h-6 rounded-2xl bg-default-200" />
+          </Skeleton>
+        </div>
+
+        <div className="text-[.95rem]">
+          <Skeleton className="w-full rounded-lg">
+            <div className="h-4 w-full rounded-lg bg-default-200" />
+          </Skeleton>
+          <Skeleton className="w-11/12 rounded-lg mt-1">
+            <div className="h-4 w-11/12 rounded-lg bg-default-200" />
+          </Skeleton>
+          <Skeleton className="w-10/12 rounded-lg mt-1">
+            <div className="h-4 w-10/12 rounded-lg bg-default-200" />
+          </Skeleton>
+
+          <Skeleton className="w-12 h-6 rounded-lg mt-2">
+            <div className="w-12 h-6 rounded-lg bg-default-300" />
+          </Skeleton>
+        </div>
+      </div>
+
+      <div className="relative px-0 pb-0 flex flex-col gap-2">
+        <div className="flex flex-wrap gap-2 items-center">
+          <Skeleton className="w-28 h-7 rounded-2xl">
+            <div className="w-28 h-7 rounded-2xl bg-default-200" />
+          </Skeleton>
+
+          <Skeleton className="w-28 h-7 rounded-2xl">
+            <div className="w-28 h-7 rounded-2xl bg-default-200" />
+          </Skeleton>
+        </div>
+
+        <div className="dateWrap flex items-center gap-2">
+          <Skeleton className="w-24 h-5 rounded-lg">
+            <div className="w-24 h-5 rounded-lg bg-default-200" />
+          </Skeleton>
+          <div className="line h-3 w-px bg-gray-300"></div>
+
+          <Skeleton className="w-24 h-5 rounded-lg">
+            <div className="w-24 h-5 rounded-lg bg-default-200" />
+          </Skeleton>
+        </div>
+
+        <div className="w-full flex items-center justify-between gap-5 mt-2">
+          <Skeleton className="w-32 h-5 rounded-lg">
+            <div className="w-32 h-5 rounded-lg bg-default-200" />
+          </Skeleton>
+
+          <Skeleton className="w-24 h-9 rounded-lg">
+            <div className="w-24 h-9 rounded-lg bg-default-300" />
+          </Skeleton>
         </div>
       </div>
     </div>
@@ -674,7 +729,7 @@ const HomeJobListing = ({ data }) => {
 
   // Determine if we should show the skeleton
   const shouldShowSkeleton = isLoadingJobs || isRefetchingJobs || !jobsData;
-
+  //const shouldShowSkeleton = true;
   return (
     <motion.section
       id="jobs"
