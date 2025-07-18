@@ -7,7 +7,7 @@ import { useAtom, atom, useSetAtom } from "jotai";
 import { searchFilterAtom } from "./HomeBanner";
 import { IoIosClose } from "react-icons/io";
 import { motion } from "framer-motion";
-import linkedInImage from "@/assets/images/linkedin-icon.png";
+// import linkedInImage from "@/assets/images/linkedin-icon.png";
 import jobIcon from "@/assets/images/job_icon.png";
 import { useTranslation } from "react-i18next";
 import { LuCalendarCheck } from "react-icons/lu";
@@ -19,11 +19,10 @@ import useApi from "../../hooks/useApi";
 import { useQuery } from "@tanstack/react-query";
 import PreLoader from "../preloader/PreLoader";
 
-import { Pagination } from "@heroui/react";
-
 export const jobsListingAtom = atom([]);
 
 import {
+  Pagination,
   Modal,
   ModalContent,
   ModalHeader,
@@ -250,7 +249,7 @@ const JobCard = ({ job }) => {
         </div>
 
         <div className="relative flex justify-between items-center flex-1 gap-1">
-          <div className="flex flex-col">
+          <div className="flex flex-col flex-1">
             {job.company.name && (
               <h3 className="m-0 mb-[.2rem] font-semibold text-[1rem] leading-[100%] text-[#2F2F2F]">
                 {job.company.name}
@@ -266,7 +265,8 @@ const JobCard = ({ job }) => {
             <a
               href={job.company.linkedin_url}
               className="shareBtn"
-              target="_blank"
+              target={"_blank"}
+              rel={"noreferrer"}
             >
               <RiShareBoxFill />
             </a>
@@ -276,7 +276,7 @@ const JobCard = ({ job }) => {
 
       <div className="relative px-3 flex-1">
         {job.title && (
-          <h3 className="m-0 mb-3 font-bold text-[1.3rem] leading-[100%] text-[#2F2F2F]">
+          <h3 className="m-0 mb-3 font-bold text-[1.3rem] leading-[110%] text-[#2F2F2F]">
             {job.title}
           </h3>
         )}
@@ -384,6 +384,7 @@ const JobCard = ({ job }) => {
               className="btn-regular outline"
               title="Details"
               target={"_blank"}
+              rel={"noreferrer"}
             >
               <span>{t("details")}</span>
             </a>
@@ -548,12 +549,19 @@ const JobSearchValues = ({ onFilterChanged, filterData }) => {
   );
 };
 
-const JobPagination = ({ data }) => {
+const JobPagination = ({ data, onFilterChanged }) => {
   const { current_page, last_page, links, total } = data;
-
+  const onPageChange = (page) => {
+    onFilterChanged({ current_page: page });
+  };
   return (
     <div className="mt-10 flex justify-center ">
-      <Pagination showControls initialPage={current_page} total={last_page} />
+      <Pagination
+        showControls
+        initialPage={current_page}
+        total={last_page}
+        onChange={(page) => onPageChange(page)}
+      />
     </div>
   );
 };
@@ -647,6 +655,10 @@ const HomeJobListing = ({ data }) => {
           params.job_functions = searchValues.job_functions.code;
         }
 
+        if (searchValues.current_page) {
+          params.page = searchValues.current_page;
+        }
+
         // Construct the query string from the 'params' object
         // This will handle encoding correctly
         const queryString = new URLSearchParams(params).toString();
@@ -660,7 +672,7 @@ const HomeJobListing = ({ data }) => {
         // Use the 'get' function with the constructed URL
         const response = await get(url); // Assuming 'get' takes the full path as argument
 
-        console.log("API Response:", response, searchValues);
+        //console.log("API Response:", response, searchValues);
 
         setJobList(response); // Assuming setJobList is a state setter for your job list
         return response; // Assuming get returns parsed JSON
@@ -677,6 +689,10 @@ const HomeJobListing = ({ data }) => {
   useEffect(() => {
     setJobList(jobsData);
   }, []);
+
+  // useEffect(() => {
+  //   console.log("jj", jobsData);
+  // }, [jobsData]);
 
   return (
     <motion.section
@@ -707,11 +723,12 @@ const HomeJobListing = ({ data }) => {
         />
 
         {isLoadingJobs && <PreLoader key={"preloader-anim"} />}
-        {jobsData && (
-          <>
-            <JobListing jobs={jobList} />
-            {jobList?.meta && <JobPagination data={jobList?.meta} />}
-          </>
+        {jobsData && <JobListing jobs={jobList} />}
+        {jobList?.meta && jobList?.meta.last_page > 1 && (
+          <JobPagination
+            data={jobList?.meta}
+            onFilterChanged={onFilterChanged}
+          />
         )}
       </Container>
     </motion.section>

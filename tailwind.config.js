@@ -14,12 +14,12 @@ export default {
       fontFamily: {
         body: ["Degular", "ui-sans-serif", "system-ui", "sans-serif"],
       },
-      colors: {
-        primary: "var(--primary-color)",
-        secondary: "var(--secondary-colo)",
-        textColor: "var(--text-color)",
-        white: "#FFF",
-      },
+      // colors: {
+      //   primary: "var(--primary-color)",
+      //   secondary: "var(--secondary-colo)",
+      //   textColor: "var(--text-color)",
+      //   white: "#FFF",
+      // },
     },
   },
 };
