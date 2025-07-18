@@ -283,7 +283,6 @@ const JobCard = ({ job }) => {
   const { t } = useTranslation();
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [scrollBehavior, setScrollBehavior] = useState("inside");
 
   return (
     <div className="w-full flex flex-col gap-3  md:gap-5 relative bg-white  rounded-2xl overflow-hidden">
@@ -360,7 +359,7 @@ const JobCard = ({ job }) => {
         {job.description && (
           <Modal
             isOpen={isOpen}
-            scrollBehavior={scrollBehavior}
+            scrollBehavior={"outside"}
             onOpenChange={onOpenChange}
             size={"5xl"}
             backdrop={"blur"}
