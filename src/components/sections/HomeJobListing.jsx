@@ -242,7 +242,11 @@ const JobCard = ({ job }) => {
       <div className="relative w-full gap-3 flex items-center p-3 border-b-1 border-b-[#4f59621a]">
         <div className="w-[3.7rem] h-[3.7rem] rounded-full overflow-hidden border-3 border-[#f6f6f6]">
           <img
-            src={job.company?.logo ? job.company.logo : jobIcon}
+            src={
+              job.company?.linkedin_logo_url
+                ? job.company.linkedin_logo_url
+                : jobIcon
+            }
             alt={job.company?.name}
             className="w-full h-full object-cover"
           />
@@ -672,7 +676,7 @@ const HomeJobListing = ({ data }) => {
         // Use the 'get' function with the constructed URL
         const response = await get(url); // Assuming 'get' takes the full path as argument
 
-        //console.log("API Response:", response, searchValues);
+        console.log("API Response:", response, searchValues);
 
         setJobList(response); // Assuming setJobList is a state setter for your job list
         return response; // Assuming get returns parsed JSON
