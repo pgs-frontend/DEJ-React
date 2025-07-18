@@ -363,6 +363,7 @@ const JobCard = ({ job }) => {
             scrollBehavior={scrollBehavior}
             onOpenChange={onOpenChange}
             size={"5xl"}
+            backdrop={"blur"}
           >
             <ModalContent>
               {(onClose) => (
