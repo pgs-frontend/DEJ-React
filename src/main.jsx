@@ -4,6 +4,7 @@ import { RouterProvider, createBrowserHistory, createRouter } from '@tanstack/re
 import { routeTree } from './routeTree.gen'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { HelmetProvider } from 'react-helmet-async'
+import './assets/scss/tailwind.css'
 import './assets/scss/app.scss'
 import './lang/i18n'
 

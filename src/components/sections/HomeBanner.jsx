@@ -14,6 +14,7 @@ export const searchFilterAtom = atom({
   company: [],
   industries: [],
   job_functions: [],
+  current_page: ''
 });
 
 const HomeBanner = ({ location }) => {

@@ -30,20 +30,20 @@ function HomePage() {
         // const queryParams = new URLSearchParams(searchValues).toString();
 
         const [
-          jobsResponse,
+          //   jobsResponse,
           companiesResponse,
           industriesResponse,
           jobFunctionsResponse,
           statesResponse,
         ] = await Promise.all([
-          get("/jobs"),
+          // get("/jobs"),
           get("/companies"),
           get("/industries"),
           get("/job-functions"),
           get("/states"),
         ]);
 
-        const jobs = await jobsResponse;
+        //    const jobs = await jobsResponse;
         const companies = await companiesResponse;
         const industries = await industriesResponse;
         const jobFunctions = await jobFunctionsResponse;
@@ -52,7 +52,7 @@ function HomePage() {
         setLocation(states.data);
 
         return {
-          jobs,
+          //    jobs,
           categories: industries.data,
           companies: companies.data,
           jobFunctions: jobFunctions.data,

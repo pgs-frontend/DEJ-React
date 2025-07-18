@@ -24,18 +24,15 @@ import { Pagination } from "@heroui/react";
 export const jobsListingAtom = atom([]);
 
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "../ui/alert-dialog";
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  Button,
+  useDisclosure,
+} from "@heroui/react";
 
-const JobCatergoryList = ({ data, onCategoryClick, activeCategories }) => {
+const JobCatergoryList = ({ data, onFilterChanged, activeCategories }) => {
   const list = useMemo(() => {
     const result = data.sort();
     return result;
@@ -62,11 +59,11 @@ const JobCatergoryList = ({ data, onCategoryClick, activeCategories }) => {
         updatedList = [...activeCategories, newItem];
       }
 
-      onCategoryClick({
+      onFilterChanged({
         job_functions: Array.from(new Set(updatedList.map((item) => item))),
       });
     },
-    [activeCategories, onCategoryClick]
+    [activeCategories, onFilterChanged]
   );
 
   const activeCheck = (code) => {
@@ -112,8 +109,7 @@ const JobFilter = ({
   companies,
   categories,
   totalJobs,
-  onCompaniesChanged,
-  onCategoriesChanged,
+  onFilterChanged,
   filterData,
 }) => {
   // const [filters, setFilters] = useState({});
@@ -182,7 +178,7 @@ const JobFilter = ({
             classNamePrefix={"dej-select"}
             className="custom-select"
             onChange={(selectedOption) =>
-              onCompaniesChanged({ company: selectedOption })
+              onFilterChanged({ company: selectedOption })
             }
             // Use the helper function to set the value correctly
             value={getCurrentSelectValue(filterData.company, [
@@ -206,7 +202,7 @@ const JobFilter = ({
             classNamePrefix={"dej-select"}
             className="custom-select"
             onChange={(selectedOption) =>
-              onCategoriesChanged({ industries: selectedOption })
+              onFilterChanged({ industries: selectedOption })
             }
             // Use the helper function to set the value correctly
             value={getCurrentSelectValue(filterData.industries, [
@@ -239,12 +235,15 @@ const JobListing = ({ jobs }) => {
 const JobCard = ({ job }) => {
   const { t } = useTranslation();
 
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [scrollBehavior, setScrollBehavior] = useState("inside");
+
   return (
     <div className="w-full flex flex-col gap-3  md:gap-5 relative bg-white  rounded-2xl overflow-hidden">
       <div className="relative w-full gap-3 flex items-center p-3 border-b-1 border-b-[#4f59621a]">
         <div className="w-[3.7rem] h-[3.7rem] rounded-full overflow-hidden border-3 border-[#f6f6f6]">
           <img
-            src={job.logo_url ? job.logo_url : jobIcon}
+            src={job.company?.logo ? job.company.logo : jobIcon}
             alt={job.company?.name}
             className="w-full h-full object-cover"
           />
@@ -294,33 +293,40 @@ const JobCard = ({ job }) => {
           </div>
         )}
 
-        <AlertDialog>
-          {job.short_description && (
-            <div className="text-[.95rem] ">
-              <div className="textBox" style={{ "--ellipsRow": 3 }}>
-                <p>{job.short_description}</p>
-              </div>
-              {job.description && (
-                <AlertDialogTrigger className="text-[.95rem] text-(--brandColor2)">
-                  [...]
-                </AlertDialogTrigger>
-              )}
+        {job.short_description && (
+          <div className="text-[.95rem] ">
+            <div className="textBox" style={{ "--ellipsRow": 3 }}>
+              <p>{job.short_description}</p>
             </div>
-          )}
-          {job.description && (
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogDescription
-                  className="font-medium"
-                  dangerouslySetInnerHTML={{ __html: job.description }}
-                ></AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Close</AlertDialogCancel>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          )}
-        </AlertDialog>
+            {job.description && (
+              <Button className="decMore" onPress={onOpen}>
+                [...]
+              </Button>
+            )}
+          </div>
+        )}
+        {job.description && (
+          <Modal
+            isOpen={isOpen}
+            scrollBehavior={scrollBehavior}
+            onOpenChange={onOpenChange}
+            size={"5xl"}
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="flex flex-col gap-1 ">
+                    {t("jobDescription")}
+                  </ModalHeader>
+                  <ModalBody
+                    className="textBox pb-6"
+                    dangerouslySetInnerHTML={{ __html: job.description }}
+                  ></ModalBody>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
+        )}
       </div>
 
       <div className="relative px-3 pb-3 flex flex-col gap-2">
@@ -471,23 +477,12 @@ const JobCardOld = ({ data }) => {
   );
 };
 
-const JobSearchValues = ({ filterData }) => {
-  const setSearchValue = useSetAtom(searchFilterAtom);
-
-  const onFilterReset = (value) => {
-    setSearchValue((data) => {
-      return {
-        ...data,
-        ...value,
-      };
-    });
-  };
-
+const JobSearchValues = ({ onFilterChanged, filterData }) => {
   return (
     <div className="w-full flex flex-wrap gap-2 items-start mb-6">
       {filterData.keyword && (
         <div
-          onClick={() => onFilterReset({ keyword: "" })}
+          onClick={() => onFilterChanged({ keyword: "" })}
           className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
         >
           <span>Keyword: </span>
@@ -498,7 +493,7 @@ const JobSearchValues = ({ filterData }) => {
 
       {filterData.state.id && (
         <div
-          onClick={() => onFilterReset({ state: [] })}
+          onClick={() => onFilterChanged({ state: [] })}
           className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
         >
           <span>Location: </span>
@@ -513,7 +508,7 @@ const JobSearchValues = ({ filterData }) => {
             item && (
               <div
                 onClick={() =>
-                  onFilterReset({
+                  onFilterChanged({
                     job_functions: filterData.job_functions.filter(
                       (el) => el !== item
                     ),
@@ -530,7 +525,7 @@ const JobSearchValues = ({ filterData }) => {
 
       {filterData.company.id && (
         <div
-          onClick={() => onFilterReset({ company: [] })}
+          onClick={() => onFilterChanged({ company: [] })}
           className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
         >
           <span>Company : </span>
@@ -541,7 +536,7 @@ const JobSearchValues = ({ filterData }) => {
 
       {filterData.industries.id && (
         <div
-          onClick={() => onFilterReset({ industries: [] })}
+          onClick={() => onFilterChanged({ industries: [] })}
           className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
         >
           <span>Category : </span>
@@ -549,44 +544,30 @@ const JobSearchValues = ({ filterData }) => {
           <IoIosClose />
         </div>
       )}
-
-      {/* {filterData.industries &&
-        filterData.industries?.map(
-          (item, index) =>
-            item && (
-              <div
-                onClick={() =>
-                  onFilterReset({
-                    industries: filterData.industries.filter(
-                      (el) => el !== item
-                    ),
-                  })
-                }
-                key={"selected-cat-" + index}
-                className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
-              >
-                {<span>{item}</span>}
-                <IoIosClose />
-              </div>
-            )
-        )} */}
     </div>
   );
 };
 
 const JobPagination = ({ data }) => {
-  return <Pagination showControls initialPage={1} total={10} />;
+  const { current_page, last_page, links, total } = data;
+
+  return (
+    <div className="mt-10 flex justify-center ">
+      <Pagination showControls initialPage={current_page} total={last_page} />
+    </div>
+  );
 };
 const HomeJobListing = ({ data }) => {
   const { get, post } = useApi();
-  const { jobs, categories, companies, jobFunctions } = data;
+  const {
+    //  jobs,
+    categories,
+    companies,
+    jobFunctions,
+  } = data;
 
   const [jobList, setJobList] = useAtom(jobsListingAtom);
   const [searchValues, setSearchValue] = useAtom(searchFilterAtom);
-
-  useEffect(() => {
-    setJobList(jobs);
-  }, []);
 
   const onFilterChanged = useCallback(
     (value) => {
@@ -600,68 +581,102 @@ const HomeJobListing = ({ data }) => {
     [searchValues]
   );
 
-  // const {
-  //   data: jobsData,
-  //   isLoading: isLoadingJobs,
-  //   isError: isErrorJobs,
-  //   isRefetching: isRefetchingJobs,
-  // } = useQuery({
-  //   queryKey: ["jobs-search", searchValues],
-  //   queryFn: async () => {
-  //     try {
-  //       const requestBody = {};
+  const {
+    data: jobsData,
+    isLoading: isLoadingJobs,
+    isError: isErrorJobs,
+    isRefetching: isRefetchingJobs,
+  } = useQuery({
+    queryKey: ["jobs-search", searchValues],
+    queryFn: async () => {
+      try {
+        const params = {};
 
-  //       if (searchValues.keyword) {
-  //         requestBody.keyword = searchValues.keyword;
-  //       }
-  //       if (typeof searchValues.state.id !== "undefined") {
-  //         requestBody.state = [searchValues.state.id];
-  //       }
-  //       if (typeof searchValues.company.id !== "undefined") {
-  //         requestBody.company = [searchValues.company.id];
-  //       }
-  //       if (
-  //         Array.isArray(searchValues.industries) &&
-  //         searchValues.industries.length > 0
-  //       ) {
-  //         requestBody.industries = searchValues.industries.map(
-  //           (item) => item.id
-  //         );
-  //       } else if (searchValues.industries && searchValues.industries.id) {
-  //         requestBody.industries = [searchValues.industries.id];
-  //       }
+        if (searchValues.keyword) {
+          params.keyword = searchValues.keyword;
+        }
 
-  //       if (
-  //         Array.isArray(searchValues.job_functions) &&
-  //         searchValues.job_functions.length > 0
-  //       ) {
-  //         requestBody.job_functions = searchValues.job_functions.map(
-  //           (item) => item.id
-  //         );
-  //       } else if (
-  //         searchValues.job_functions &&
-  //         searchValues.job_functions.id
-  //       ) {
-  //         requestBody.job_functions = searchValues.job_functions.id;
-  //       }
+        // Handle 'state' - it's already an array or undefined
+        // If state is an array, join it with commas for URL param
+        if (
+          Array.isArray(searchValues.state) &&
+          searchValues.state.length > 0
+        ) {
+          params.state = searchValues.state.join(","); // e.g., state=1,2,3
+        }
+        // If state is an object with an id (e.g., from a single select dropdown)
+        else if (
+          searchValues.state &&
+          typeof searchValues.state.id !== "undefined"
+        ) {
+          params.state = searchValues.state.id;
+        }
 
-  //       //    const queryParams = new URLSearchParams(requestBody).toString();
+        // Handle 'company' - extract 'id' if it exists
+        if (
+          searchValues.company &&
+          typeof searchValues.company.id !== "undefined"
+        ) {
+          params.company = searchValues.company.id;
+        }
 
-  //       const response = await post(`/jobs`, requestBody);
-  //       // const response = await get(`/jobs`);
+        // Handle 'industries' - can be an array of objects or a single object
+        if (
+          Array.isArray(searchValues.industries) &&
+          searchValues.industries.length > 0
+        ) {
+          params.industries = searchValues.industries
+            .map((item) => item.id)
+            .join(","); // Join IDs with commas for URL param
+        } else if (searchValues.industries && searchValues.industries.id) {
+          params.industries = searchValues.industries.id;
+        }
 
-  //       console.log(requestBody, "res");
-  //       setListJobs(response);
-  //       return response; // Assuming get returns parsed JSON
-  //     } catch (error) {
-  //       console.error("Error fetching jobs data:", error);
-  //       throw error;
-  //     }
-  //   },
-  //   enabled: Object.keys(searchValues).length > 0,
-  //   staleTime: 30000,
-  //   cacheTime: 5 * 60 * 1000,
-  // });
+        // Handle 'job_functions' - can be an array of objects or a single object
+        if (
+          Array.isArray(searchValues.job_functions) &&
+          searchValues.job_functions.length > 0
+        ) {
+          params.job_functions = searchValues.job_functions
+            .map((item) => item.code)
+            .join(","); // Join IDs with commas for URL param
+        } else if (
+          searchValues.job_functions &&
+          searchValues.job_functions.code
+        ) {
+          params.job_functions = searchValues.job_functions.code;
+        }
+
+        // Construct the query string from the 'params' object
+        // This will handle encoding correctly
+        const queryString = new URLSearchParams(params).toString();
+
+        // console.log("Search Store Params:", searchValues);
+        // console.log("Query Params:", queryString);
+
+        // Construct the full URL with query parameters
+        const url = `/jobs?${queryString}`;
+
+        // Use the 'get' function with the constructed URL
+        const response = await get(url); // Assuming 'get' takes the full path as argument
+
+        console.log("API Response:", response, searchValues);
+
+        setJobList(response); // Assuming setJobList is a state setter for your job list
+        return response; // Assuming get returns parsed JSON
+      } catch (error) {
+        console.error("Error fetching jobs data:", error);
+        throw error;
+      }
+    },
+    // enabled: Object.keys(searchValues).length > 0,
+    // staleTime: 30000,
+    // cacheTime: 5 * 60 * 1000,
+  });
+
+  useEffect(() => {
+    setJobList(jobsData);
+  }, []);
 
   return (
     <motion.section
@@ -673,10 +688,9 @@ const HomeJobListing = ({ data }) => {
       className="block w-full overflow-hidden relative pb-[7rem] bg-[var(--bg-color)]"
     >
       <Container>
-        {/* {isLoadingJobs && <PreLoader key={"preloader-anim"} />} */}
         <JobCatergoryList
           data={jobFunctions}
-          onCategoryClick={onFilterChanged}
+          onFilterChanged={onFilterChanged}
           activeCategories={searchValues?.job_functions}
         />
 
@@ -684,18 +698,21 @@ const HomeJobListing = ({ data }) => {
           companies={companies}
           categories={categories}
           totalJobs={jobList?.meta ? jobList?.meta.total : 0}
-          onCategoriesChanged={onFilterChanged}
-          onCompaniesChanged={onFilterChanged}
+          onFilterChanged={onFilterChanged}
           filterData={searchValues}
         />
-        <JobSearchValues filterData={searchValues} />
-        <JobPagination data={jobList?.meta} />
+        <JobSearchValues
+          onFilterChanged={onFilterChanged}
+          filterData={searchValues}
+        />
 
-        {/* {jobsData && ( */}
-        <>
-          <JobListing jobs={jobList} />
-        </>
-        {/* )} */}
+        {isLoadingJobs && <PreLoader key={"preloader-anim"} />}
+        {jobsData && (
+          <>
+            <JobListing jobs={jobList} />
+            {jobList?.meta && <JobPagination data={jobList?.meta} />}
+          </>
+        )}
       </Container>
     </motion.section>
   );
