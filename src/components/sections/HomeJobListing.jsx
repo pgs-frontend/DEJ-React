@@ -61,6 +61,7 @@ const JobCatergoryList = ({ data, onFilterChanged, activeCategories }) => {
       }
 
       onFilterChanged({
+        current_page: 0,
         job_functions: Array.from(new Set(updatedList.map((item) => item))),
       });
     },
@@ -91,7 +92,7 @@ const JobCatergoryList = ({ data, onFilterChanged, activeCategories }) => {
   // );
 
   return (
-    <ul className="flex flex-wrap w-full items-center gap-3 overflow-x-scroll no-scrollbar justify-center ">
+    <ul className=" jobFunctions  ">
       {list?.map((item, index) => (
         <li className="relative inline-block" key={"category-" + index}>
           <button
@@ -162,8 +163,8 @@ const JobFilter = ({
   };
 
   return (
-    <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-12 mb-6">
-      <div className="inline-flex flex flex-col w-full sm:w-auto sm:flex-row items-center gap-6 lg:gap-3">
+    <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-5 mt-6 md:mt-12 mb-6">
+      <div className="inline-flex flex flex-col w-full sm:w-auto sm:flex-row items-center gap-3">
         {filters.companies && (
           <Select
             options={[
@@ -179,7 +180,7 @@ const JobFilter = ({
             classNamePrefix={"dej-select"}
             className="custom-select"
             onChange={(selectedOption) =>
-              onFilterChanged({ company: selectedOption })
+              onFilterChanged({ current_page: 0, company: selectedOption })
             }
             // Use the helper function to set the value correctly
             value={getCurrentSelectValue(filterData.company, [
@@ -203,7 +204,7 @@ const JobFilter = ({
             classNamePrefix={"dej-select"}
             className="custom-select"
             onChange={(selectedOption) =>
-              onFilterChanged({ industries: selectedOption })
+              onFilterChanged({ current_page: 0, industries: selectedOption })
             }
             // Use the helper function to set the value correctly
             value={getCurrentSelectValue(filterData.industries, [
@@ -222,50 +223,58 @@ const JobFilter = ({
 };
 
 const JobListing = ({ shouldShowSkeleton, jobs }) => {
+  const { t } = useTranslation();
   return (
     <div className="relative grid grid-cols-1 sm:grid-cols-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 ">
-      {shouldShowSkeleton
-        ? [...Array(4)].map((_, index) => (
-            <div className="w-full flex flex-col gap-3  md:gap-5 relative bg-white  rounded-2xl overflow-hidden">
-              <div className="relative w-full gap-3 flex items-center p-3 border-b-1 border-b-[#4f59621a]">
-                <div className="w-[3.7rem] h-[3.7rem] rounded-full overflow-hidden">
-                  <Skeleton className="flex rounded-full w-full h-full" />
-                </div>
-
-                <div className="relative flex justify-between items-center flex-1 gap-1">
-                  <div className="flex flex-col flex-1 gap-1">
-                    <Skeleton className="h-3 w-4/5 rounded-lg" />
-                    <Skeleton className="h-1.5 w-3/5 rounded-lg" />
-                  </div>
-                  <Skeleton className="flex rounded-sm w-5 h-5" />
-                </div>
+      {shouldShowSkeleton ? (
+        [...Array(4)].map((_, index) => (
+          <div
+            className="w-full flex flex-col gap-3  md:gap-5 relative bg-white  rounded-2xl overflow-hidden"
+            key={"skeleton" + index}
+          >
+            <div className="relative w-full gap-3 flex items-center p-3 border-b-1 border-b-[#4f59621a]">
+              <div className="w-[3.7rem] h-[3.7rem] rounded-full overflow-hidden">
+                <Skeleton className="flex rounded-full w-full h-full" />
               </div>
 
-              <div className="relative px-3 pb-3  flex-1 space-y-3">
-                <Skeleton className="w-5/5 rounded-sm">
-                  <div className="h-4 w-3/5 rounded-lg bg-default-200" />
-                </Skeleton>
-                <Skeleton className="w-2/5 h-4  rounded-lg bg-[#b68b351a]"></Skeleton>
-                <Skeleton className="w-5/5 h-20 rounded-lg bg-[#eee]"></Skeleton>
-                <div className="relative  flex gap-3 space-x-3 mt-10">
-                  <Skeleton className="w-2/5 h-6  rounded-2xl bg-[#0a66c21a]"></Skeleton>
-                  <Skeleton className="w-2/5 h-6  rounded-2xl bg-[#0a66c21a]"></Skeleton>
+              <div className="relative flex justify-between items-center flex-1 gap-1">
+                <div className="flex flex-col flex-1 gap-1">
+                  <Skeleton className="h-3 w-4/5 rounded-lg" />
+                  <Skeleton className="h-1.5 w-3/5 rounded-lg" />
                 </div>
-                <Skeleton className="w-5/5 h-6  rounded-lg bg-[#eee]"></Skeleton>
-                <div className="relative  flex gap-3 justify-between">
-                  <Skeleton className="w-1/5 h-6  rounded-2xl ">
-                    <div className="h-full w-full  bg-default-100" />
-                  </Skeleton>
-                  <Skeleton className="w-2/5 h-6  rounded-2xl ">
-                    <div className="h-full w-full  bg-default-100" />
-                  </Skeleton>
-                </div>
+                <Skeleton className="flex rounded-sm w-5 h-5" />
               </div>
             </div>
-          ))
-        : jobs?.data?.map((item, index) => (
-            <JobCard job={item} key={"jobs-" + index} />
-          ))}
+
+            <div className="relative px-3 pb-3  flex-1 space-y-3">
+              <Skeleton className="w-5/5 rounded-sm">
+                <div className="h-4 w-3/5 rounded-lg bg-default-200" />
+              </Skeleton>
+              <Skeleton className="w-2/5 h-4  rounded-lg bg-[#b68b351a]"></Skeleton>
+              <Skeleton className="w-5/5 h-20 rounded-lg bg-[#eee]"></Skeleton>
+              <div className="relative  flex gap-3 space-x-3 mt-10">
+                <Skeleton className="w-2/5 h-6  rounded-2xl bg-[#0a66c21a]"></Skeleton>
+                <Skeleton className="w-2/5 h-6  rounded-2xl bg-[#0a66c21a]"></Skeleton>
+              </div>
+              <Skeleton className="w-5/5 h-6  rounded-lg bg-[#eee]"></Skeleton>
+              <div className="relative  flex gap-3 justify-between">
+                <Skeleton className="w-1/5 h-6  rounded-2xl ">
+                  <div className="h-full w-full  bg-default-100" />
+                </Skeleton>
+                <Skeleton className="w-2/5 h-6  rounded-2xl ">
+                  <div className="h-full w-full  bg-default-100" />
+                </Skeleton>
+              </div>
+            </div>
+          </div>
+        ))
+      ) : jobs?.meta?.total === 0 ? (
+        <div className="noData">{t("noResultsFound")}</div>
+      ) : (
+        jobs?.data?.map((item, index) => (
+          <JobCard job={item} key={"jobs-" + index} />
+        ))
+      )}
     </div>
   );
 };
@@ -438,96 +447,13 @@ const JobCard = ({ job }) => {
   );
 };
 
-const JobCardOld = ({ data }) => {
-  const { t } = useTranslation();
-  return (
-    <div className="w-full flex flex-col gap-4 relative bg-white p-4 rounded-3xl overflow-hidden">
-      <div className="relative w-full gap-4 flex items-center justify-between">
-        {data.logo_url && (
-          <div className="w-[4rem] h-[4rem] rounded-full overflow-hidden border-3 border-[#f6f6f6] ">
-            <img
-              src={data.logo_url}
-              alt={data.company}
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
-
-        {data.predicted_de_job_category && (
-          <div className="block">
-            <div className="inline-block items-center bg-[#b68a3512] text-[#B68A35] font-medium px-3 py-1 rounded-2xl text-sm">
-              {data.predicted_de_job_category}
-            </div>
-          </div>
-        )}
-      </div>
-
-      <div className="block relative w-full flex-1">
-        {data.job_title && (
-          <div className="w-full flex item-start gap-5 mt-1 justify-between">
-            <h3 className="block font-bold text-start flex-1 text-lg">
-              {data.job_title}
-            </h3>
-          </div>
-        )}
-        {data.company && <p className="block text-sm mt-2">{data.company}</p>}
-      </div>
-
-      <div className="flex w-full items-center gap-2">
-        {/* {
-                                        data.status &&
-                                        <div className="inline-block items-center bg-[#0a66c217] text-[#0A66C2] font-medium px-3 py-1 rounded-2xl text-sm">{data.status}</div>
-                                    } */}
-
-        <div className="inline-flex items-center gap-2 border border-slate-200 bg-[#f2f8ff] rounded-2xl">
-          {/* <div className="w-6 h-6 inline-flex items-center justify-center rounded-full bg-[#595c60]">
-                                        <LuCalendarCheck className="text-[#fff]" size={12} />
-                                    </div>
-                                         */}
-          <p className="font-medium leading-[100%] p-0 inline-block text-sm bg-text bg-[#4f5962] text-white px-2 py-2 rounded-2xl">
-            Posted
-          </p>
-          <p className="font-medium leading-[100%] p-0 inline-block text-sm me-2">
-            {moment(data.inserted_date).format("LL")}
-          </p>
-        </div>
-      </div>
-
-      <hr className="border-[#f6f6f6]" />
-
-      <div className="w-full flex items-center justify-between gap-5">
-        {data.predicted_location && (
-          <div className="inline-flex gap-2 items-center">
-            {/* <FiMapPin /> */}
-            <p className="text-sm truncate font-medium">
-              {data.predicted_location}
-            </p>
-          </div>
-        )}
-
-        {data.predicted_link && (
-          <a
-            href={data.predicted_link}
-            referrerPolicy={"no-referrer"}
-            className="btn-regular outline"
-            title="Details"
-            target={"_blank"}
-          >
-            <span>{t("details")}</span>
-          </a>
-        )}
-      </div>
-    </div>
-  );
-};
-
 const JobSearchValues = ({ onFilterChanged, filterData }) => {
   return (
-    <div className="w-full flex flex-wrap gap-2 items-start mb-6">
+    <div className="selectedFilterList ">
       {filterData.keyword && (
         <div
           onClick={() => onFilterChanged({ keyword: "" })}
-          className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
+          className="filterItem "
         >
           <span>Keyword: </span>
           {<span>{filterData.keyword}</span>}
@@ -538,7 +464,7 @@ const JobSearchValues = ({ onFilterChanged, filterData }) => {
       {filterData.state.id && (
         <div
           onClick={() => onFilterChanged({ state: [] })}
-          className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
+          className="filterItem"
         >
           <span>Location: </span>
           {<span>{filterData.state.label}</span>}
@@ -559,7 +485,7 @@ const JobSearchValues = ({ onFilterChanged, filterData }) => {
                   })
                 }
                 key={"selected-cat-" + index}
-                className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
+                className="filterItem"
               >
                 {<span>{item.name}</span>}
                 <IoIosClose />
@@ -570,7 +496,7 @@ const JobSearchValues = ({ onFilterChanged, filterData }) => {
       {filterData.company.id && (
         <div
           onClick={() => onFilterChanged({ company: [] })}
-          className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
+          className="filterItem"
         >
           <span>Company : </span>
           {<span>{filterData.company.label}</span>}
@@ -581,7 +507,7 @@ const JobSearchValues = ({ onFilterChanged, filterData }) => {
       {filterData.industries.id && (
         <div
           onClick={() => onFilterChanged({ industries: [] })}
-          className="w-auto relative inline-flex items-center gap-2 bg-[var(--text-color)] text-white text-sm font-medium px-2 py-1 rounded-2xl transition-opacity cursor-pointer hover:opacity-75"
+          className="filterItem"
         >
           <span>Category : </span>
           {<span>{filterData.industries.label}</span>}
@@ -593,15 +519,24 @@ const JobSearchValues = ({ onFilterChanged, filterData }) => {
 };
 
 const JobPagination = ({ data, onFilterChanged }) => {
-  const { current_page, last_page, links, total } = data;
+  const { current_page, last_page } = data;
+  const [activePage, setActivePage] = useState(current_page);
+
+  useEffect(() => {
+    setActivePage(current_page);
+    // console.log("Pagination component updated to page:", current_page);
+  }, [current_page]);
+
   const onPageChange = (page) => {
+    setActivePage(page);
     onFilterChanged({ current_page: page });
   };
+
   return (
     <div className="mt-10 flex justify-center ">
       <Pagination
         showControls
-        initialPage={current_page}
+        page={activePage}
         total={last_page}
         onChange={(page) => onPageChange(page)}
       />
@@ -715,7 +650,7 @@ const HomeJobListing = ({ data }) => {
         // Use the 'get' function with the constructed URL
         const response = await get(url); // Assuming 'get' takes the full path as argument
 
-        console.log("API Response:", response, searchValues);
+        // console.log("API Response:", response, searchValues);
 
         setJobList(response); // Assuming setJobList is a state setter for your job list
         return response; // Assuming get returns parsed JSON
@@ -759,7 +694,7 @@ const HomeJobListing = ({ data }) => {
         <JobFilter
           companies={companies}
           categories={categories}
-          totalJobs={jobList?.meta ? jobList?.meta.total : 0}
+          totalJobs={jobList?.meta ? jobList?.meta?.total : 0}
           onFilterChanged={onFilterChanged}
           filterData={searchValues}
         />

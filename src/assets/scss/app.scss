@@ -253,8 +253,9 @@ header {
   display: inline-block;
   background-color: #eee;
   padding-inline: 1rem;
-  padding-block: 0.5rem;
+  padding-block: 0.6rem;
   font-size: 0.9rem;
+  line-height: 100%;
   transition: all 0.3s ease;
   cursor: pointer;
   border: none;
@@ -262,7 +263,10 @@ header {
   white-space: nowrap;
   border-radius: 1.5rem;
   font-weight: 500;
-
+  @media only screen and (max-width: 767px) {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
   &:hover {
     background-color: var(--text-color);
     color: #fff;
@@ -747,7 +751,7 @@ header {
 .bg-background {
   background-color: #fff;
 }
-
+[role="button"],
 button {
   cursor: pointer;
 }
@@ -758,4 +762,68 @@ button {
   min-width: auto;
   height: auto;
   color: var(--brandColor2);
+}
+
+.noData {
+  padding: 1rem;
+  background: #fff;
+  grid-column: -1/1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 10rem;
+  border-radius: 1.5rem;
+  font-size: 1.1rem;
+  color: hsl(from var(--gray) h s l / 0.5);
+  font-weight: 500;
+}
+
+.jobFunctions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  @media only screen and (max-width: 767px) {
+    gap: 0.3rem;
+  }
+}
+
+.filterItem {
+  display: inline-flex;
+  align-items: center;
+
+  position: relative;
+  background: var(--text-color);
+  color: #fff;
+  padding: 0.4rem 0.8rem;
+  padding-inline-end: 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.9rem;
+  line-height: 100%;
+  cursor: pointer;
+  transition: all 0.4s ease-in-out;
+  @media only screen and (max-width: 767px) {
+    font-size: 0.8rem;
+  }
+  svg {
+    margin-inline-start: 0.3rem;
+  }
+
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.selectedFilterList {
+  // w-full flex flex-wrap gap-2 items-start mb-6
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  @media only screen and (max-width: 767px) {
+    gap: 0.3rem;
+    margin-bottom: 1rem;
+  }
 }

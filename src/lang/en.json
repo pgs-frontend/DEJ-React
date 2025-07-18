@@ -23,5 +23,6 @@
   "expires": "Expires",
   "all_companies": "All Companies",
   "all_categories": "All Categories",
-  "jobDescription": "Job Description"
+  "jobDescription": "Job Description",
+  "noResultsFound": "No Results Found"
 }

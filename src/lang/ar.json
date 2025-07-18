@@ -23,5 +23,6 @@
   "expires": "نهاية",
   "all_companies": "جميع الشركات",
   "all_categories": "جميع الفئات",
-  "jobDescription": "المسمى الوظيفي"
+  "jobDescription": "المسمى الوظيفي",
+  "noResultsFound": "لم يتم العثور على نتائج"
 }
